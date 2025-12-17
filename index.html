@@ -1,115 +1,67 @@
-<!-- Scene: Camera Viewer -->
-<div id="scene-cam-viewer" class="scene">
-  <div class="cam-viewer">
-    <button id="btn-close-cam" class="btn close-btn">✕</button>
-    <video id="cam-video" autoplay playsinline></video>
-  </div>
-</div>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WINDOW - Monitor System</title>
+  <title>WINDOW – Monitor System</title>
 
   <link rel="stylesheet" href="style.css" />
 
-  <!-- WebGazer.js -->
+  <!-- WebGazer -->
   <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 </head>
 <body>
 
-  <!-- Scene 1: Loading -->
+  <!-- LOADING -->
   <div id="scene-loading" class="scene active">
-    <div class="loading-center">
-      <div class="system-title">WINDOW // MONITOR SYSTEM</div>
-
-      <!-- ❗ 不再用 Typed.js -->
-      <div id="loading-text" class="loading-text">
-        Initializing monitoring system...
-      </div>
-
-      <button id="btn-start" class="btn primary">
-        Start System Calibration
-      </button>
+    <div class="center">
+      <h1>WINDOW // MONITOR SYSTEM</h1>
+      <button id="btn-start" class="btn primary">Start Calibration</button>
     </div>
   </div>
 
-  <!-- Scene 2: CCTV Wall -->
+  <!-- WALL -->
   <div id="scene-wall" class="scene">
     <header class="top-bar">
       <div class="logo">WINDOW / CCTV GRID</div>
-      <div class="status">
-        <span>EYE: ACTIVE</span>
-        <span>MODE: OBSERVATION</span>
-      </div>
     </header>
 
-    <main class="wall-layout">
-      <section class="wall-grid" id="wall-grid"></section>
+    <div class="wall-layout">
 
-      <aside class="side-panel">
-        <div class="panel-block">
-          <h3>Current Focus</h3>
-          <div id="label-viewer">None</div>
-        </div>
+      <!-- LEFT MAIN VIEWER (你画红叉的区域) -->
+      <div id="main-viewer" class="main-viewer">
+        <video id="main-video" autoplay playsinline></video>
+      </div>
 
-        <div class="panel-block">
-          <h3>Voyeur Score</h3>
-          <div id="score-voyeur" class="panel-text-large">0</div>
-        </div>
+      <!-- RIGHT GRID -->
+      <div class="right-area">
+        <section id="wall-grid" class="wall-grid"></section>
 
-        <div class="panel-block">
-          <button id="btn-to-logs" class="btn">
-            Enter Log Console
-          </button>
-        </div>
-      </aside>
-    </main>
+        <aside class="side-panel">
+          <div class="panel-block">
+            <h3>Current Focus</h3>
+            <div id="label-viewer">None</div>
+            <div class="fix-bar">
+              <div id="fix-progress"></div>
+            </div>
+          </div>
+
+          <div class="panel-block">
+            <h3>Voyeur Score</h3>
+            <div id="score-voyeur" class="score">0</div>
+          </div>
+        </aside>
+      </div>
+    </div>
 
     <div id="gaze-dot"></div>
   </div>
 
-  <!-- Scene 3: Logs -->
-  <div id="scene-logs" class="scene">
-    <header class="top-bar">
-      <div class="logo">WINDOW / LOG CONSOLE</div>
-    </header>
-
-    <main class="logs-layout">
-      <section class="logs-panel">
-        <div id="log-lines" class="log-lines"></div>
-      </section>
-
-      <aside class="side-panel">
-        <div class="panel-block">
-          <button id="btn-to-report" class="btn">
-            Generate Surveillance Report
-          </button>
-        </div>
-      </aside>
-    </main>
-
-    <div id="gaze-dot-logs"></div>
-  </div>
-
-  <!-- Scene 4: Report -->
-  <div id="scene-report" class="scene">
-    <div class="report-center">
-      <h1>Surveillance Behavior Report</h1>
-      <div id="report-text"></div>
-      <button id="btn-restart" class="btn">Restart</button>
-    </div>
-  </div>
-
-  <!-- Calibration Overlay -->
+  <!-- CALIBRATION -->
   <div id="calibration-overlay" class="calibration hidden">
-    <div class="calib-box">
-      <h2>Calibration</h2>
-      <p>Please look at the center of the screen.</p>
-      <button id="btn-calib-start" class="btn primary">
-        Begin
-      </button>
+    <div class="center">
+      <p>Look at the center of the screen</p>
+      <button id="btn-calib-start" class="btn primary">Begin</button>
     </div>
   </div>
 
