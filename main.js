@@ -1,4 +1,7 @@
 (() => {
+  /* =========================
+     DOM REFERENCES
+  ========================= */
   const scenes = {
     loading: document.getElementById('scene-loading'),
     wall: document.getElementById('scene-wall'),
@@ -7,26 +10,37 @@
   };
 
   const btnStart = document.getElementById('btn-start');
+  const btnCalibStart = document.getElementById('btn-calib-start');
   const btnToLogs = document.getElementById('btn-to-logs');
   const btnToReport = document.getElementById('btn-to-report');
   const btnRestart = document.getElementById('btn-restart');
-  const btnCalibStart = document.getElementById('btn-calib-start');
 
   const wallGrid = document.getElementById('wall-grid');
   const scoreVoyeur = document.getElementById('score-voyeur');
   const labelViewer = document.getElementById('label-viewer');
+
   const gazeDot = document.getElementById('gaze-dot');
   const gazeDotLogs = document.getElementById('gaze-dot-logs');
 
   const calibrationOverlay = document.getElementById('calibration-overlay');
 
+  /* =========================
+     GLOBAL STATE
+  ========================= */
   const state = {
     currentScene: 'loading',
     wallWindows: [],
     voyeurScore: 0,
-    gazePos: { x: 0, y: 0 },
+
     gazeEnabled: false,
+    gazePos: { x: 0, y: 0 },
+
+    currentFixationTarget: null,
+    fixationTime: 0, // seconds
   };
+
+  const FIXATION_THRESHOLD = 3.0; // seconds required for intentional gaze
+  const FIXATION_INTERVAL = 0.2;  // seconds per update tick
 
   const WINDOW_TYPES = [
     'BEDROOM',
@@ -37,16 +51,23 @@
     'ELEVATOR',
   ];
 
+  /* =========================
+     SCENE CONTROL
+  ========================= */
   function switchScene(name) {
     state.currentScene = name;
-    Object.entries(scenes).forEach(([k, el]) =>
-      el.classList.toggle('active', k === name)
-    );
+
+    Object.entries(scenes).forEach(([key, el]) => {
+      el.classList.toggle('active', key === name);
+    });
 
     gazeDot.style.display = name === 'wall' ? 'block' : 'none';
     gazeDotLogs.style.display = name === 'logs' ? 'block' : 'none';
   }
 
+  /* =========================
+     BUTTON EVENTS
+  ========================= */
   btnStart.onclick = () => {
     calibrationOverlay.classList.remove('hidden');
   };
@@ -61,6 +82,9 @@
   btnToReport.onclick = () => switchScene('report');
   btnRestart.onclick = () => location.reload();
 
+  /* =========================
+     CCTV WALL CREATION
+  ========================= */
   function createWall() {
     wallGrid.innerHTML = '';
     state.wallWindows = [];
@@ -81,27 +105,29 @@
       state.wallWindows.push({
         el,
         type,
-        fixation: 0,
+        fixationAccumulated: 0,
+        hasTriggered: false,
       });
-
-      el.onclick = () => {
-        labelViewer.textContent = `Focused on ${type}`;
-        state.voyeurScore += type === 'BEDROOM' ? 8 : 3;
-        updateScore();
-      };
     }
   }
 
+  /* =========================
+     VOYEUR SCORE UPDATE
+  ========================= */
   function updateScore() {
     scoreVoyeur.textContent = state.voyeurScore.toFixed(0);
   }
 
+  /* =========================
+     GAZE INITIALIZATION
+  ========================= */
   function initGaze() {
     if (!window.webgazer) return;
 
     webgazer
       .setGazeListener((data) => {
         if (!data) return;
+
         state.gazePos = { x: data.x, y: data.y };
 
         if (state.currentScene === 'wall') {
@@ -117,28 +143,65 @@
         state.gazeEnabled = true;
       });
 
-    setInterval(updateFixation, 200);
+    setInterval(updateFixation, FIXATION_INTERVAL * 1000);
   }
 
+  /* =========================
+     FIXATION LOGIC (CORE)
+  ========================= */
   function updateFixation() {
     if (!state.gazeEnabled || state.currentScene !== 'wall') return;
 
     const { x, y } = state.gazePos;
+    let hitWindow = null;
 
-    state.wallWindows.forEach((w) => {
-      const r = w.el.getBoundingClientRect();
-      if (x > r.left && x < r.right && y > r.top && y < r.bottom) {
-        w.fixation += 0.2;
-        state.voyeurScore += w.type === 'BEDROOM' ? 0.25 : 0.1;
+    for (const w of state.wallWindows) {
+      const rect = w.el.getBoundingClientRect();
+      if (x >= rect.left && x <= rect.right &&
+          y >= rect.top && y <= rect.bottom) {
+        hitWindow = w;
+        break;
       }
-    });
+    }
 
-    updateScore();
+    // If gaze moved to a different window, reset fixation
+    if (hitWindow !== state.currentFixationTarget) {
+      state.currentFixationTarget = hitWindow;
+      state.fixationTime = 0;
+    }
+
+    // If gazing at a window, accumulate time
+    if (hitWindow) {
+      state.fixationTime += FIXATION_INTERVAL;
+
+      // Trigger only once per window
+      if (
+        state.fixationTime >= FIXATION_THRESHOLD &&
+        !hitWindow.hasTriggered
+      ) {
+        hitWindow.hasTriggered = true;
+        hitWindow.fixationAccumulated += state.fixationTime;
+
+        // Update voyeur score (bedroom is more sensitive)
+        state.voyeurScore += hitWindow.type === 'BEDROOM' ? 12 : 6;
+        updateScore();
+
+        // Update UI label
+        labelViewer.textContent = `Intentional focus detected: ${hitWindow.type}`;
+      }
+    } else {
+      state.fixationTime = 0;
+      state.currentFixationTarget = null;
+    }
   }
 
+  /* =========================
+     INIT
+  ========================= */
   function init() {
     switchScene('loading');
     createWall();
+    updateScore();
   }
 
   document.addEventListener('DOMContentLoaded', init);
