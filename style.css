@@ -1,131 +1,444 @@
 * { box-sizing: border-box; }
+html, body { height: 100%; }
 
-body {
-  margin: 0;
-  background: #05060a;
-  color: #e6e6e6;
-  font-family: system-ui, sans-serif;
-  overflow: hidden;
+body{
+  margin:0;
+  background:#05060a;
+  color:#e8e8e8;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  overflow:hidden;
+}
+
+/* ===== SCENES ===== */
+.scene{ display:none; height:100%; }
+.scene.active{ display:block; }
+
+#scene-start{
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+#scene-start.active{
+  display:flex;
+}
+
+.start-center{
+  text-align:center;
+  max-width:520px;
+  padding:24px;
+}
+.start-title{
+  letter-spacing: 0.08em;
+  font-weight:700;
+  margin:0 0 10px;
+}
+.start-sub{
+  opacity:0.75;
+  margin:0 0 18px;
+}
+.start-hint{
+  opacity:0.6;
+  margin-top:12px;
+  font-size:12px;
+}
+
+/* ===== BUTTONS ===== */
+.btn{
+  border:1px solid #2a2f40;
+  background:#0b0e18;
+  color:#e8e8e8;
+  border-radius:10px;
+  padding:10px 14px;
+  cursor:pointer;
+}
+.btn.primary{
+  border-color:#ff4040;
+  box-shadow:0 0 0 1px rgba(255,64,64,0.25) inset;
+}
+.btn.tiny{
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:12px;
 }
 
 /* ===== TOP BAR ===== */
-
-.top-bar {
-  height: 48px;
-  padding: 0 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #1c1f2a;
-  background: #070812;
+.top-bar{
+  height:48px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 16px;
+  border-bottom:1px solid #1c1f2a;
+  background:#070812;
 }
+.top-left, .top-right{ letter-spacing:0.06em; font-size:13px; opacity:0.95; }
 
 /* ===== LAYOUT ===== */
-
-.layout {
-  display: grid;
-  grid-template-columns: 40% auto 240px;
-  height: calc(100vh - 48px);
+.layout{
+  height:calc(100vh - 48px);
+  display:grid;
+  grid-template-columns: 38% 1fr 260px;
 }
 
-/* ===== MAIN VIEW ===== */
-
-.main-viewer {
-  background: #000;
-  border-right: 1px solid #1c1f2a;
+/* ===== LEFT PANEL (FOCUS VIEW) ===== */
+.left-panel{
+  border-right:1px solid #1c1f2a;
+  background:#000;
+  display:flex;
+  flex-direction:column;
 }
-
-.main-viewer video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.focus-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  border-bottom:1px solid #1c1f2a;
+  background:#070812;
+}
+.focus-title{ letter-spacing:0.08em; font-size:12px; opacity:0.9; }
+.focus-view{
+  position:relative;
+  flex:1;
+  background:#000;
+}
+.focus-placeholder{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  opacity:0.6;
+  padding:16px;
+  line-height:1.4;
+}
+.focus-video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:none;
 }
 
 /* ===== WALL GRID ===== */
-
-.wall-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(120px, 1fr));
-  grid-template-rows: repeat(2, minmax(160px, 1fr));
-  gap: 12px;
-  padding: 12px;
-  min-width: 420px;
-}
-
-/* ===== CAM ===== */
-
-.cam {
-  position: relative;
-  background: linear-gradient(145deg, #0b0e18, #06070c);
-  border: 1px solid #1e2230;
-  border-radius: 12px;
-  min-height: 160px;
-  overflow: hidden;
-  transition: box-shadow 0.25s ease, filter 0.25s ease;
-}
-
-.cam-label {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  font-size: 12px;
-}
-
-/* ===== GAZE STATES ===== */
-
-.cam.gaze-enter {
-  box-shadow: 0 0 0 2px #ff4040 inset;
-}
-
-.cam.level-1 { filter: brightness(1.15); }
-
-.cam.level-2 {
-  animation: breathe 2s ease-in-out infinite;
-}
-
-.cam.level-3::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 80% 80%, rgba(0,0,0,0.6), transparent 60%);
-  opacity: 0.2;
-}
-
-.cam.ghost {
-  animation: ghost-flash 0.25s linear;
-}
-
-@keyframes breathe {
-  0%,100% { filter: brightness(1.1); }
-  50% { filter: brightness(1.25); }
-}
-
-@keyframes ghost-flash {
-  from { box-shadow: 0 0 0 4px red inset; }
-  to { box-shadow: 0 0 0 0 red inset; }
+.wall-grid{
+  padding:12px;
+  display:grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  grid-template-rows: repeat(2, minmax(220px, 1fr));
+  gap:12px;
+  background: radial-gradient(1200px 600px at 60% 20%, rgba(255,255,255,0.03), transparent 60%);
+  min-width: 620px;
 }
 
 /* ===== SIDE PANEL ===== */
-
-.side-panel {
-  border-left: 1px solid #1c1f2a;
-  padding: 12px;
+.side-panel{
+  border-left:1px solid #1c1f2a;
+  padding:12px;
+  background: #05060a;
 }
-
-.panel h3 {
-  margin: 0 0 6px;
-  font-size: 14px;
+.panel{
+  border:1px solid #1c1f2a;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:12px;
+  background: rgba(255,255,255,0.02);
+}
+.panel.small{ opacity:0.9; font-size:12px; }
+.panel h3{ margin:0 0 8px; font-size:13px; opacity:0.9; }
+.score{ font-size:34px; color:#ff4040; font-weight:700; }
+.progress-wrap{
+  margin-top:10px;
+  height:8px;
+  border-radius:999px;
+  background: rgba(255,255,255,0.06);
+  overflow:hidden;
+}
+.progress-bar{
+  height:100%;
+  width:0%;
+  background: #ff4040;
 }
 
 /* ===== GAZE DOT ===== */
-
-#gaze-dot {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: red;
-  pointer-events: none;
+#gaze-dot{
+  position:fixed;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#ff4040;
+  pointer-events:none;
   transform: translate(-50%, -50%);
-  z-index: 9999;
+  z-index:9999;
+  box-shadow: 0 0 12px rgba(255,64,64,0.55);
+}
+
+/* ===== CAM BASE ===== */
+.cam{
+  position:relative;
+  border-radius:16px;
+  border:1px solid #1e2230;
+  overflow:hidden;
+  background: linear-gradient(145deg, #0b0e18, #06070c);
+  transition: box-shadow 140ms ease, filter 140ms ease, transform 140ms ease;
+}
+.cam .rec{
+  position:absolute;
+  top:10px;
+  right:10px;
+  font-size:11px;
+  color:#ff4040;
+  border:1px solid rgba(255,64,64,0.5);
+  padding:4px 8px;
+  border-radius:999px;
+  background: rgba(0,0,0,0.35);
+  letter-spacing:0.14em;
+}
+.cam .cam-label{
+  position:absolute;
+  left:10px;
+  bottom:10px;
+  font-size:12px;
+  letter-spacing:0.12em;
+  padding:6px 8px;
+  border-radius:10px;
+  background: rgba(0,0,0,0.45);
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+/* red frame on gaze */
+.cam.gaze-enter{
+  box-shadow: 0 0 0 2px #ff4040 inset, 0 0 24px rgba(255,64,64,0.12);
+}
+
+/* ===== GLOBAL GHOST HEARTBEAT ===== */
+body.ghost-heartbeat::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background: rgba(255,0,0,0.12);
+  pointer-events:none;
+  z-index:9998;
+  animation: heartbeatFlash 420ms ease-out;
+}
+@keyframes heartbeatFlash{
+  0%{ opacity:0; }
+  30%{ opacity:1; }
+  100%{ opacity:0; }
+}
+
+/* ===== CAM-SPECIFIC ANIMATION LAYERS ===== */
+.cam::before, .cam::after{ content:''; position:absolute; inset:0; pointer-events:none; opacity:0; }
+
+/* ---------------- CAM01 PRIVATE_SUITE ---------------- */
+.cam-01.level-1::before{
+  opacity:0.9;
+  background: radial-gradient(900px 400px at 60% 40%, rgba(255,190,120,0.22), transparent 60%);
+}
+.cam-01.level-2{
+  animation: cam01Breath 2.2s ease-in-out infinite;
+}
+@keyframes cam01Breath{
+  0%,100%{ filter: brightness(1.06); }
+  50%{ filter: brightness(1.24); }
+}
+.cam-01.level-3::after{
+  opacity:0.55;
+  background: radial-gradient(220px 220px at 82% 82%, rgba(0,0,0,0.65), transparent 60%);
+  animation: cam01Shadow 1.2s ease-in-out infinite;
+}
+@keyframes cam01Shadow{
+  0%,100%{ transform: translate(0,0); opacity:0.35; }
+  50%{ transform: translate(-10px,-8px); opacity:0.6; }
+}
+.cam-01.ghost{
+  animation: cam01Ghost 240ms linear;
+}
+@keyframes cam01Ghost{
+  from{ filter: contrast(1.2) brightness(1.35); }
+  to{ filter: none; }
+}
+
+/* ---------------- CAM02 SERVICE_CORRIDOR ---------------- */
+.cam-02.level-1::before{
+  opacity:0.55;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+  animation: cam02FarMove 1.1s ease-in-out infinite;
+}
+@keyframes cam02FarMove{
+  0%{ transform: translateX(-18%); opacity:0.2; }
+  50%{ transform: translateX(18%); opacity:0.6; }
+  100%{ transform: translateX(-18%); opacity:0.2; }
+}
+.cam-02.level-2::after{
+  opacity:0.55;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(90deg, rgba(255,64,64,0.06) 0 1px, transparent 1px 9px);
+  mix-blend-mode: screen;
+  animation: cam02Glitch 240ms steps(2) infinite;
+}
+@keyframes cam02Glitch{
+  0%{ transform: translate(0,0); }
+  50%{ transform: translate(2px,-1px); }
+  100%{ transform: translate(-2px,1px); }
+}
+.cam-02.level-3{
+  filter: contrast(1.15) brightness(1.08);
+}
+.cam-02.ghost{
+  animation: cam02Flash 220ms linear;
+}
+@keyframes cam02Flash{
+  from{ box-shadow: 0 0 0 999px rgba(255,255,255,0.18) inset; }
+  to{ box-shadow: 0 0 0 0 rgba(255,255,255,0) inset; }
+}
+
+/* ---------------- CAM03 STAIRWELL ---------------- */
+.cam-03.level-1{
+  animation: cam03Flicker 520ms steps(2) infinite;
+}
+@keyframes cam03Flicker{
+  0%{ filter: brightness(1.0); }
+  50%{ filter: brightness(1.18); }
+  100%{ filter: brightness(0.98); }
+}
+.cam-03.level-2::before{
+  opacity:0.55;
+  background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,0.14) 50%, transparent 65%);
+  animation: cam03Rail 1.2s ease-in-out infinite;
+}
+@keyframes cam03Rail{
+  0%{ transform: translateX(-18%); }
+  100%{ transform: translateX(18%); }
+}
+.cam-03.level-3::after{
+  opacity:0.35;
+  background: radial-gradient(120px 200px at 18% 30%, rgba(0,0,0,0.85), transparent 70%);
+  filter: blur(1px);
+  animation: cam03Sil 1.4s ease-in-out infinite;
+}
+@keyframes cam03Sil{
+  0%,100%{ opacity:0.22; transform: translateY(0); }
+  50%{ opacity:0.42; transform: translateY(6px); }
+}
+.cam-03.ghost{
+  animation: cam03Ghost 260ms linear;
+}
+@keyframes cam03Ghost{
+  from{ filter: contrast(1.25) brightness(1.25); }
+  to{ filter:none; }
+}
+
+/* ---------------- CAM04 REAR_ENTRANCE ---------------- */
+.cam-04.level-1::before{
+  opacity:0.45;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 6px);
+  animation: cam04Wind 1.6s linear infinite;
+}
+@keyframes cam04Wind{
+  from{ transform: translateY(0); }
+  to{ transform: translateY(14px); }
+}
+.cam-04.level-2::after{
+  opacity:0.45;
+  background: linear-gradient(90deg, transparent 40%, rgba(255,230,170,0.18) 50%, transparent 60%);
+  animation: cam04Door 1.1s ease-in-out infinite;
+}
+@keyframes cam04Door{
+  0%,100%{ transform: translateX(-10%); opacity:0.22; }
+  50%{ transform: translateX(10%); opacity:0.55; }
+}
+.cam-04.level-3{
+  filter: brightness(1.08) contrast(1.1);
+}
+.cam-04.ghost{
+  animation: cam04Ghost 260ms linear;
+}
+@keyframes cam04Ghost{
+  from{ box-shadow: 0 0 0 2px rgba(255,64,64,0.9) inset; filter: brightness(1.35); }
+  to{ box-shadow:none; filter:none; }
+}
+
+/* ---------------- CAM05 PARKING_LOT ---------------- */
+.cam-05.level-1::before{
+  opacity:0.35;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 7px);
+  animation: cam05Scan 740ms linear infinite;
+}
+@keyframes cam05Scan{
+  from{ transform: translateY(-8px); }
+  to{ transform: translateY(10px); }
+}
+.cam-05.level-2::after{
+  opacity:0.35;
+  background: radial-gradient(220px 220px at 75% 25%, rgba(255,255,255,0.15), transparent 60%);
+  animation: cam05Glint 1.0s ease-in-out infinite;
+}
+@keyframes cam05Glint{
+  0%,100%{ opacity:0.1; transform: scale(0.98); }
+  50%{ opacity:0.5; transform: scale(1.02); }
+}
+.cam-05.level-3{
+  filter: contrast(1.15) brightness(1.05);
+}
+.cam-05.ghost{
+  animation: cam05Ghost 250ms linear;
+}
+@keyframes cam05Ghost{
+  from{ filter: brightness(1.25) contrast(1.25); }
+  to{ filter:none; }
+}
+
+/* ---------------- CAM06 OFFICE_DESK ---------------- */
+.cam-06.level-1::before{
+  opacity:0.35;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 8px);
+  animation: cam06Noise 260ms steps(2) infinite;
+}
+@keyframes cam06Noise{
+  0%{ transform: translate(0,0); }
+  50%{ transform: translate(1px,0); }
+  100%{ transform: translate(-1px,0); }
+}
+.cam-06.level-2::after{
+  opacity:0.35;
+  background: radial-gradient(420px 220px at 55% 35%, rgba(120,180,255,0.14), transparent 60%);
+  animation: cam06Monitor 1.8s ease-in-out infinite;
+}
+@keyframes cam06Monitor{
+  0%,100%{ opacity:0.18; }
+  50%{ opacity:0.46; }
+}
+.cam-06.level-3{
+  filter: brightness(1.12) contrast(1.12);
+}
+.cam-06.ghost{
+  animation: cam06Ghost 220ms linear;
+}
+@keyframes cam06Ghost{
+  from{ box-shadow:0 0 0 2px rgba(255,64,64,0.9) inset; }
+  to{ box-shadow:none; }
+}
+
+/* ===== ghost overlay video reused (moved by JS) ===== */
+.ghost-video{
+  position:fixed;
+  left:-9999px;
+  top:-9999px;
+  width:1px;
+  height:1px;
+  opacity:0;
+}
+.cam .ghost-overlay{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  pointer-events:none;
+  background: rgba(255,255,255,0);
+}
+.cam.show-ghost-video .ghost-overlay{
+  opacity:1;
+  background: rgba(255,255,255,0.08);
 }
