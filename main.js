@@ -184,20 +184,52 @@ function createWall() {
   /* =========================
      FIXATION LOGIC (CORE)
   ========================= */
-  function updateFixation() {
-    if (!state.gazeEnabled || state.currentScene !== 'wall') return;
+function updateFixation() {
+  if (!state.gazeEnabled || state.currentScene !== 'wall') return;
 
-    const { x, y } = state.gazePos;
-    let hitWindow = null;
+  const { x, y } = state.gazePos;
+  let hit = null;
 
-    for (const w of state.wallWindows) {
-      const rect = w.el.getBoundingClientRect();
-      if (x >= rect.left && x <= rect.right &&
-          y >= rect.top && y <= rect.bottom) {
-        hitWindow = w;
-        break;
-      }
+  state.wallWindows.forEach(w => {
+    w.el.classList.remove(
+      'gaze-focus',
+      'gaze-lv1',
+      'gaze-lv2',
+      'gaze-lv3',
+      'gaze-ghost'
+    );
+
+    const r = w.el.getBoundingClientRect();
+    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+      hit = w;
     }
+  });
+
+  if (!hit) {
+    state.fixationTime = 0;
+    state.currentFixationTarget = null;
+    return;
+  }
+
+  hit.el.classList.add('gaze-focus');
+
+  if (hit !== state.currentFixationTarget) {
+    state.currentFixationTarget = hit;
+    state.fixationTime = 0;
+  }
+
+  state.fixationTime += FIXATION_INTERVAL;
+
+  if (state.fixationTime > 0.4) hit.el.classList.add('gaze-lv1');
+  if (state.fixationTime > 0.9) hit.el.classList.add('gaze-lv2');
+  if (state.fixationTime > 1.4) hit.el.classList.add('gaze-lv3');
+
+  if (state.fixationTime > 2.2 && !hit.el.classList.contains('gaze-ghost')) {
+    hit.el.classList.add('gaze-ghost');
+    state.voyeurScore += 5;
+    updateScore();
+  }
+}
 
     // If gaze moved to a different window, reset fixation
     if (hitWindow !== state.currentFixationTarget) {
