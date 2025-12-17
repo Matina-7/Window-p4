@@ -1,4 +1,3 @@
-/* 通用样式 */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -13,13 +12,12 @@ body {
   overflow: hidden;
 }
 
-/* 场景切换基础 */
+/* 场景切换 */
 .scene {
   position: absolute;
   inset: 0;
   display: none;
 }
-
 .scene.active {
   display: flex;
 }
@@ -33,247 +31,142 @@ body {
   color: #e5e5e5;
   cursor: pointer;
   font-size: 14px;
-  transition: background 0.2s, transform 0.1s;
 }
-
 .btn.primary {
   background: #e53935;
   border-color: #e53935;
 }
 
-.btn:hover {
-  background: #272a35;
-  transform: translateY(-1px);
-}
-
-/* 场景 1：加载画面 */
+/* 加载页 */
 .loading-center {
   margin: auto;
   text-align: center;
 }
-
 .system-title {
   font-size: 18px;
   letter-spacing: 0.12em;
   color: #9fa8da;
   margin-bottom: 24px;
 }
-
 .loading-text {
   min-height: 40px;
   margin-bottom: 24px;
-  font-family: "SF Mono", Menlo, monospace;
+  font-family: monospace;
   color: #c5cae9;
 }
 
-/* 顶部条 */
+/* 顶栏 */
 .top-bar {
   height: 52px;
   border-bottom: 1px solid #222;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 0 16px;
   background: linear-gradient(to right, #05060a, #101322);
 }
-
 .logo {
-  font-size: 14px;
+  font-size: 13px;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: #b0bec5;
 }
-
 .status span {
-  margin-left: 12px;
   font-size: 12px;
+  margin-left: 12px;
   color: #90a4ae;
 }
 
-/* 监控墙布局 */
+/* 主体布局 */
 .wall-layout {
   flex: 1;
   display: flex;
   height: calc(100vh - 52px);
 }
 
+/* 🔴 关键改动：监控格子 = 3 列 × 2 行 */
 .wall-grid {
   flex: 3;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 1fr;
-  gap: 6px;
-  padding: 8px;
+  gap: 8px;
+  padding: 12px;
   background: radial-gradient(circle at top, #151824 0, #05060a 60%);
 }
 
 .cam-window {
   position: relative;
-  background: #05060a;
   border: 1px solid #272a35;
-  overflow: hidden;
-  cursor: pointer;
+  background: #000;
 }
-
 .cam-window-inner {
   width: 100%;
   height: 100%;
-  background-size: cover;
-  background-position: center;
-  filter: grayscale(0.4) contrast(1.1);
+  background: linear-gradient(135deg, #1e1e2f, #0d0f1a);
+  filter: grayscale(0.5);
 }
-
 .cam-label {
   position: absolute;
+  bottom: 6px;
   left: 6px;
-  bottom: 4px;
   font-size: 10px;
-  font-family: "SF Mono", Menlo, monospace;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0,0,0,0.7);
   padding: 2px 4px;
-  border-radius: 2px;
 }
-
 .cam-rec {
   position: absolute;
+  top: 6px;
   right: 6px;
-  top: 4px;
   font-size: 10px;
-  font-family: "SF Mono", Menlo, monospace;
   color: #ef5350;
 }
 
-/* 右侧信息面板 */
+/* 侧边栏 */
 .side-panel {
   flex: 1;
   border-left: 1px solid #222;
-  background: #05070f;
   padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  background: #05070f;
 }
-
 .panel-block {
   border: 1px solid #202331;
-  border-radius: 4px;
+  margin-bottom: 10px;
   padding: 10px;
   background: #080a13;
 }
-
-.panel-block h3 {
-  font-size: 13px;
-  margin-bottom: 6px;
-  color: #cfd8dc;
-}
-
-.panel-text {
-  font-size: 12px;
-  color: #90a4ae;
-}
-
 .panel-text-large {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 26px;
   color: #ef5350;
 }
 
-/* 日志场景布局 */
-.logs-layout {
-  flex: 1;
-  display: flex;
-  height: calc(100vh - 52px);
-}
-
-.logs-panel {
-  flex: 3;
-  padding: 10px;
-  background: #05060a;
-}
-
-.log-lines {
-  height: 100%;
-  border: 1px solid #222;
-  border-radius: 4px;
-  padding: 8px;
-  overflow-y: auto;
-  font-family: "SF Mono", Menlo, monospace;
-  font-size: 11px;
-}
-
-.log-line {
-  padding: 2px 0;
-  color: #9e9e9e;
-}
-
-.log-line.sensitive {
-  color: #ffcc80;
-}
-
-/* 报告场景 */
-.report-center {
-  margin: auto;
-  max-width: 620px;
-  padding: 24px;
-  border-radius: 6px;
-  border: 1px solid #303240;
-  background: radial-gradient(circle at top, #151824 0, #05060a 60%);
-}
-
-.report-center h1 {
-  font-size: 22px;
-  margin-bottom: 16px;
-}
-
-.report-text {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #cfd8dc;
-  margin-bottom: 20px;
-}
-
-/* 眼动小点 */
+/* 眼动点 */
 #gaze-dot,
 #gaze-dot-logs {
   position: fixed;
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 82, 82, 0.7);
-  background: rgba(244, 67, 54, 0.3);
-  pointer-events: none;
+  background: rgba(244,67,54,0.4);
+  border: 1px solid rgba(255,82,82,0.8);
   transform: translate(-50%, -50%);
+  pointer-events: none;
   z-index: 9999;
   display: none;
 }
 
-/* 校准层 */
+/* 校准 */
 .calibration {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.75);
   display: flex;
 }
-
 .calibration.hidden {
   display: none;
 }
-
 .calib-box {
   margin: auto;
   padding: 20px;
   background: #101322;
-  border-radius: 4px;
   border: 1px solid #303240;
-  text-align: center;
-}
-
-.calib-box h2 {
-  margin-bottom: 10px;
-}
-
-.calib-box p {
-  font-size: 13px;
-  color: #b0bec5;
-  margin-bottom: 12px;
 }
