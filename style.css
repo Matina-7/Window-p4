@@ -1,94 +1,127 @@
-/* =========================
-   BASIC RESET
-========================= */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+(() => {
+  const scenes = {
+    loading: document.getElementById('scene-loading'),
+    wall: document.getElementById('scene-wall'),
+    logs: document.getElementById('scene-logs'),
+    report: document.getElementById('scene-report'),
+    camViewer: document.getElementById('scene-cam-viewer'),
+  };
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: #05060a;
-  color: #e5e5e5;
-  height: 100vh;
-  overflow: hidden;
-}
+  const wallGrid = document.getElementById('wall-grid');
+  const labelViewer = document.getElementById('label-viewer');
+  const scoreVoyeur = document.getElementById('score-voyeur');
+  const fixProgress = document.getElementById('fix-progress');
 
-.scene { position: absolute; inset: 0; display: none; }
-.scene.active { display: flex; }
+  const camVideo = document.getElementById('cam-video');
+  const btnCloseCam = document.getElementById('btn-close-cam');
 
-/* =========================
-   BUTTON
-========================= */
-.btn {
-  padding: 10px 18px;
-  border-radius: 10px;
-  border: 1px solid #3a3a44;
-  background: #141621;
-  color: #e5e5e5;
-  cursor: pointer;
-}
-.btn.primary { background: #e53935; border-color: #e53935; }
+  const CFG = {
+    ghostTime: 2.2,
+    turnTime: 3.0
+  };
 
-/* =========================
-   HEARTBEAT FLASH
-========================= */
-.system-heartbeat {
-  animation: systemPulse 0.35s ease-out;
-}
-@keyframes systemPulse {
-  0% { box-shadow: inset 0 0 0 rgba(0,0,0,0); }
-  30% {
-    box-shadow: inset 0 0 0 9999px rgba(239,83,80,0.12);
+  const state = {
+    wallWindows: [],
+    currentTarget: null,
+    fixationS: 0,
+    voyeurScore: 0,
+    ghostTriggered: false
+  };
+
+  function switchScene(name) {
+    Object.values(scenes).forEach(s => s.classList.remove('active'));
+    scenes[name].classList.add('active');
   }
-  100% { box-shadow: inset 0 0 0 rgba(0,0,0,0); }
-}
 
-/* =========================
-   FIXATION BAR
-========================= */
-.fix-bar {
-  margin-top: 8px;
-  height: 6px;
-  border-radius: 999px;
-  background: #1a1d2a;
-  overflow: hidden;
-}
-#fix-progress {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #ef5350, #ff867c);
-  transition: width 0.1s linear;
-}
+  /* =========================
+     WALL SETUP
+  ========================= */
+  function createWall() {
+    const cams = [
+      { id: 'CAM_01', type: 'PRIVATE_SUITE' },
+      { id: 'CAM_02', type: 'SERVICE_CORRIDOR' },
+      { id: 'CAM_03', type: 'STAIRWELL_C2' },
+      { id: 'CAM_04', type: 'REAR_ENTRANCE' },
+      { id: 'CAM_05', type: 'PARKING_LOT_A' },
+      { id: 'CAM_06', type: 'OFFICE_DESK_03' },
+    ];
 
-/* =========================
-   CAM VIEWER (POP-UP PAGE)
-========================= */
-.cam-viewer {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    wallGrid.innerHTML = '';
+    state.wallWindows = [];
 
-.cam-viewer video {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;   /* 👈 自适配视频比例 */
-}
+    cams.forEach(cam => {
+      const el = document.createElement('div');
+      el.className = 'cam-window';
+      el.innerHTML = `
+        <div class="cam-window-inner"></div>
+        <div class="cam-label">${cam.type} / ${cam.id}</div>
+        <div class="cam-rec">REC</div>
+      `;
 
-.close-btn {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  z-index: 10;
-  background: rgba(0,0,0,0.6);
-}
+      el.addEventListener('click', () => openCamViewer(cam.id));
 
-/* =========================
-   GAZE REACTION (简化版)
-========================= */
-.cam-window.gaze-enter {
-  border-color: rgba(239,83,80,0.8);
-  box-shadow: 0 0 0 2px rgba(239,83,80,0.4);
-}
+      wallGrid.appendChild(el);
+      state.wallWindows.push({ el, id: cam.id, type: cam.type });
+    });
+  }
+
+  /* =========================
+     CAM VIEWER
+  ========================= */
+  async function openCamViewer(camId) {
+    switchScene('camViewer');
+
+    if (camId === 'CAM_01') {
+      camVideo.src = 'suit.mov';   // ✅ GitHub 中的视频
+      camVideo.play();
+    }
+
+    if (camId === 'CAM_02') {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      camVideo.srcObject = stream;
+      camVideo.play();
+    }
+  }
+
+  btnCloseCam.onclick = () => {
+    camVideo.pause();
+    camVideo.src = '';
+    camVideo.srcObject = null;
+    switchScene('wall');
+  };
+
+  /* =========================
+     REACTION LOGIC (简化演示)
+  ========================= */
+  function simulateFixation(dt) {
+    state.fixationS += dt;
+    labelViewer.textContent = `Fixation: ${state.fixationS.toFixed(2)}s`;
+
+    const pct = Math.min(state.fixationS / CFG.ghostTime, 1);
+    fixProgress.style.width = (pct * 100) + '%';
+
+    state.voyeurScore += dt * 10;
+    scoreVoyeur.textContent = Math.floor(state.voyeurScore);
+
+    if (state.fixationS >= CFG.ghostTime && !state.ghostTriggered) {
+      state.ghostTriggered = true;
+      document.body.classList.add('system-heartbeat');
+      setTimeout(() => {
+        document.body.classList.remove('system-heartbeat');
+      }, 350);
+    }
+  }
+
+  /* =========================
+     INIT
+  ========================= */
+  function init() {
+    switchScene('wall');
+    createWall();
+
+    // demo loop（你真实项目中这里接 gaze）
+    setInterval(() => simulateFixation(0.05), 50);
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
