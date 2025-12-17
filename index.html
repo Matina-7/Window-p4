@@ -2,58 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>WINDOW / Monitor System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WINDOW – Monitor System</title>
 
   <link rel="stylesheet" href="style.css" />
   <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 </head>
+
 <body>
 
-  <!-- MONITOR WALL -->
-  <div id="scene-wall" class="scene active">
+<header class="top-bar">
+  <div>WINDOW / CCTV GRID</div>
+  <div>EYE: ACTIVE · MODE: OBSERVATION</div>
+</header>
 
-    <header class="top-bar">
-      <div class="logo">WINDOW / CCTV GRID</div>
-      <div class="status">EYE: ACTIVE · MODE: OBSERVATION</div>
-    </header>
+<main class="layout">
 
-    <div class="wall-layout">
-
-      <!-- LEFT MAIN VIEWER -->
-      <div id="main-viewer" class="main-viewer">
-        <video id="main-video" autoplay playsinline></video>
-      </div>
-
-      <!-- RIGHT SIDE -->
-      <div class="right-area">
-
-        <!-- CCTV GRID -->
-        <section id="wall-grid" class="wall-grid"></section>
-
-        <!-- SIDE PANEL -->
-        <aside class="side-panel">
-          <div class="panel-block">
-            <h3>Current Focus</h3>
-            <div id="label-viewer">None</div>
-            <div class="fix-bar">
-              <div id="fix-progress"></div>
-            </div>
-          </div>
-
-          <div class="panel-block">
-            <h3>Voyeur Score</h3>
-            <div id="score-voyeur" class="score">0</div>
-          </div>
-        </aside>
-
-      </div>
-    </div>
-
-    <!-- GAZE DOT -->
-    <div id="gaze-dot"></div>
+  <!-- LEFT MAIN VIEWER -->
+  <div id="main-viewer" class="main-viewer">
+    <video id="main-video" autoplay muted playsinline></video>
   </div>
 
-  <script src="main.js"></script>
+  <!-- CCTV GRID -->
+  <div id="wall-grid" class="wall-grid"></div>
+
+  <!-- SIDE PANEL -->
+  <aside class="side-panel">
+    <div class="panel">
+      <h3>Current Focus</h3>
+      <div id="label-viewer">None</div>
+    </div>
+    <div class="panel">
+      <h3>Voyeur Score</h3>
+      <div id="score-voyeur">0</div>
+    </div>
+  </aside>
+
+</main>
+
+<div id="gaze-dot"></div>
+
+<script src="main.js"></script>
 </body>
 </html>
