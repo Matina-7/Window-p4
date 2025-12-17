@@ -418,12 +418,14 @@
      - Ghost: webcam reflection overlay flash
   ========================= */
   function updateReactions(dt) {
-    // Clear all classes
-    for (const w of state.wallWindows) clearClasses(w.el);
+  // Clear all classes
+  for (const w of state.wallWindows) clearClasses(w.el);
 
-    const hit = hitWindowByPoint(state.snapped.x, state.snapped.y);
+  let hit =
+    hitWindowByPoint(state.snapped.x, state.snapped.y) ||
+    hitWindowByPoint(state.smooth.x, state.smooth.y);
 
-    // Immediate red frame on hover (enter)
+  // Immediate red frame on hover (enter)
     if (hit) hit.el.classList.add('gaze-enter');
 
     if (!hit) {
