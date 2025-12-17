@@ -1,14 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WINDOW</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-    <h1>Hello World</h1>
 
-    <script src="main.js"></script>
+<body>
+  <!-- Scene: Start -->
+  <section id="scene-start" class="scene active">
+    <div class="center">
+      <div class="title">WINDOW // MONITOR SYSTEM</div>
+      <div class="subtitle">Anti-surveillance interface prototype</div>
+      <button id="btn-start" class="btn primary">Enter CCTV Wall</button>
+      <div class="hint">If the button works, we are ready for the next step.</div>
+    </div>
+  </section>
+
+  <!-- Scene: Wall -->
+  <section id="scene-wall" class="scene">
+    <header class="topbar">
+      <div class="brand">WINDOW / CCTV GRID</div>
+      <div class="status">
+        <span id="status-eye">EYE: OFF</span>
+        <span id="status-mode">MODE: MANUAL</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section id="wall-grid" class="grid"></section>
+
+      <aside class="panel">
+        <div class="card">
+          <div class="card-title">Current Window</div>
+          <div id="label" class="card-value">None</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Voyeur Score</div>
+          <div id="score" class="score">0</div>
+        </div>
+
+        <div class="card">
+          <button id="btn-logs" class="btn">Open Logs</button>
+        </div>
+      </aside>
+    </main>
+
+    <div id="gaze-dot" aria-hidden="true"></div>
+  </section>
+
+  <!-- Scene: Logs -->
+  <section id="scene-logs" class="scene">
+    <header class="topbar">
+      <div class="brand">WINDOW / LOG CONSOLE</div>
+      <div class="status">
+        <span id="status-log">STATUS: READY</span>
+        <button id="btn-back" class="btn">Back</button>
+      </div>
+    </header>
+
+    <main class="logs">
+      <div id="logbox" class="logbox"></div>
+    </main>
+  </section>
+
+  <script src="main.js"></script>
 </body>
 </html>
