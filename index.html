@@ -1,1 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WINDOW — Anti-Surveillance System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Eye Tracking -->
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+</head>
+<body>
+
+  <!-- SCENE 1: LOADING -->
+  <section id="scene-loading" class="scene active">
+    <div class="center">
+      <h1 class="title">WINDOW</h1>
+      <p class="subtitle">Monitoring system initializing…</p>
+      <button id="btn-start" class="btn primary">BEGIN CALIBRATION</button>
+    </div>
+  </section>
+
+  <!-- SCENE 2: CCTV WALL -->
+  <section id="scene-wall" class="scene">
+    <header class="top-bar">
+      <span class="logo">WINDOW / CCTV GRID</span>
+      <span id="eye-status" class="status">EYE: OFF</span>
+    </header>
+
+    <main class="wall-layout">
+      <div id="wall-grid" class="wall-grid"></div>
+
+      <aside class="side-panel">
+        <div class="panel">
+          <h3>Behavior</h3>
+          <div id="behavior-label">UNIDENTIFIED</div>
+        </div>
+
+        <div class="panel">
+          <h3>Voyeur Score</h3>
+          <div id="voyeur-score">0</div>
+        </div>
+
+        <button id="btn-to-report" class="btn">GENERATE REPORT</button>
+      </aside>
+    </main>
+
+    <div id="gaze-dot"></div>
+  </section>
+
+  <!-- SCENE 3: REPORT -->
+  <section id="scene-report" class="scene">
+    <div class="center report">
+      <h2>Behavior Analysis</h2>
+      <div id="report-text"></div>
+      <button id="btn-restart" class="btn">RESTART</button>
+    </div>
+  </section>
+
+  <!-- CALIBRATION OVERLAY -->
+  <div id="calibration" class="overlay hidden">
+    <div class="overlay-box">
+      <h2>Calibration</h2>
+      <p>
+        Look at the center of your screen.<br />
+        Stay still for a moment, then begin.
+      </p>
+      <button id="btn-calibrate" class="btn primary">START TRACKING</button>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
 
