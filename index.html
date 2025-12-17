@@ -1,108 +1,56 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>WINDOW — Anti-Surveillance System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WINDOW - 反窥视监控系统</title>
 
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Typed.js 打字机效果（以后用在加载文字、日志等） -->
-  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.16"></script>
-  <!-- WebGazer.js 眼动追踪 -->
+  <!-- WebGazer -->
   <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 </head>
 <body>
-  <!-- 场景 1：加载画面 -->
+
+  <!-- SCENE: LOADING -->
   <div id="scene-loading" class="scene active">
-    <div class="loading-center">
-      <div class="system-title">WINDOW // MONITOR SYSTEM</div>
-      <div id="loading-text" class="loading-text"></div>
-      <button id="btn-start" class="btn primary">开始系统校准</button>
+    <div class="center">
+      <h1>WINDOW</h1>
+      <p class="subtitle">Initializing monitoring system…</p>
+      <button id="btn-start">Start Calibration</button>
     </div>
   </div>
 
-  <!-- 场景 2：监控墙 -->
+  <!-- SCENE: WALL -->
   <div id="scene-wall" class="scene">
-    <header class="top-bar">
-      <div class="logo">WINDOW / CCTV GRID</div>
-      <div class="status">
-        <span id="status-eye">EYE: INIT</span>
-        <span id="status-mode">MODE: IDLE</span>
-      </div>
+    <header>
+      <span>WINDOW / CCTV GRID</span>
+      <span id="status">EYE: TRACKING</span>
     </header>
 
-    <main class="wall-layout">
-      <section class="wall-grid" id="wall-grid">
-        <!-- JS 里动态生成一堆小监控窗口 -->
-      </section>
+    <main>
+      <section id="wall-grid"></section>
 
-      <aside class="side-panel">
-        <div class="panel-block">
-          <h3>当前观察标签</h3>
-          <div id="label-viewer" class="panel-text">尚未确定</div>
-        </div>
-        <div class="panel-block">
-          <h3>偷窥倾向指数</h3>
-          <div id="score-voyeur" class="panel-text-large">0</div>
-        </div>
-        <div class="panel-block">
-          <button id="btn-to-logs" class="btn">进入日志后台</button>
-        </div>
+      <aside>
+        <h3>Behavior Label</h3>
+        <div id="behavior-label">UNIDENTIFIED</div>
+
+        <h3>Voyeur Score</h3>
+        <div id="voyeur-score">0</div>
+
+        <button id="btn-to-report">Generate Report</button>
       </aside>
     </main>
 
-    <!-- 眼动位置小点 -->
     <div id="gaze-dot"></div>
   </div>
 
-  <!-- 场景 3：日志后台 -->
-  <div id="scene-logs" class="scene">
-    <header class="top-bar">
-      <div class="logo">WINDOW / LOG CONSOLE</div>
-      <div class="status">
-        <span id="status-log-eye">EYE: TRACKING</span>
-        <span id="status-log-level">RISK: LOW</span>
-      </div>
-    </header>
-
-    <main class="logs-layout">
-      <section class="logs-panel">
-        <div id="log-lines" class="log-lines">
-          <!-- JS 动态添加一行一行的日志 -->
-        </div>
-      </section>
-      <aside class="side-panel">
-        <div class="panel-block">
-          <h3>注视敏感度</h3>
-          <div id="log-sensitivity" class="panel-text">等待数据...</div>
-        </div>
-        <div class="panel-block">
-          <button id="btn-to-report" class="btn">生成监控报告</button>
-        </div>
-      </aside>
-    </main>
-
-    <div id="gaze-dot-logs"></div>
-  </div>
-
-  <!-- 场景 4：结局 / 报告 -->
+  <!-- SCENE: REPORT -->
   <div id="scene-report" class="scene">
-    <div class="report-center">
-      <h1>监控行为分析报告</h1>
-      <div id="report-text" class="report-text">
-        <!-- JS 根据你全过程的眼动数据生成一段文字 -->
-      </div>
-      <button id="btn-restart" class="btn">重新体验</button>
-    </div>
-  </div>
-
-  <!-- 校准提示（简单版） -->
-  <div id="calibration-overlay" class="calibration hidden">
-    <div class="calib-box">
-      <h2>简单校准</h2>
-      <p>请看着屏幕中央，然后点击“开始”。</p>
-      <button id="btn-calib-start" class="btn primary">开始校准</button>
+    <div class="center report">
+      <h2>Behavior Analysis Report</h2>
+      <div id="report-text"></div>
+      <button id="btn-restart">Restart</button>
     </div>
   </div>
 
