@@ -17,7 +17,7 @@
       <h1 class="start-title">WINDOW // MONITOR SYSTEM</h1>
       <p class="start-sub">Initializing monitoring system...</p>
       <button id="btn-start" class="btn primary">Start System Calibration</button>
-      <p class="start-hint">Tip: Allow camera permission for eye tracking.</p>
+      <p class="start-hint">Allow camera permission for eye tracking.</p>
     </div>
   </section>
 
@@ -29,7 +29,7 @@
     </header>
 
     <main class="layout">
-      <!-- LEFT: FOCUS VIEW (video / webcam) -->
+      <!-- LEFT -->
       <section class="left-panel">
         <div class="focus-header">
           <div class="focus-title">FOCUS VIEW</div>
@@ -39,54 +39,28 @@
         <div id="focus-view" class="focus-view">
           <div id="focus-placeholder" class="focus-placeholder">
             No feed selected.<br/>
-            Fixate CAM_01 or CAM_02 for 3.0s to open a feed.
+            Fixate CAM_01 or CAM_02 for 3.0s.
           </div>
-
           <video id="focus-video" class="focus-video" autoplay muted playsinline></video>
         </div>
       </section>
 
-      <!-- CENTER: 6 CAM WALL (STATIC) -->
+      <!-- CENTER -->
       <section id="wall-grid" class="wall-grid">
-        <div class="cam cam-01" data-cam="CAM_01">
-          <div class="rec">REC</div>
-          <div class="cam-label">PRIVATE_SUITE / CAM_01</div>
-        </div>
-
-        <div class="cam cam-02" data-cam="CAM_02">
-          <div class="rec">REC</div>
-          <div class="cam-label">SERVICE_CORRIDOR / CAM_02</div>
-        </div>
-
-        <div class="cam cam-03" data-cam="CAM_03">
-          <div class="rec">REC</div>
-          <div class="cam-label">STAIRWELL_C2 / CAM_03</div>
-        </div>
-
-        <div class="cam cam-04" data-cam="CAM_04">
-          <div class="rec">REC</div>
-          <div class="cam-label">REAR_ENTRANCE / CAM_04</div>
-        </div>
-
-        <div class="cam cam-05" data-cam="CAM_05">
-          <div class="rec">REC</div>
-          <div class="cam-label">PARKING_LOT_A / CAM_05</div>
-        </div>
-
-        <div class="cam cam-06" data-cam="CAM_06">
-          <div class="rec">REC</div>
-          <div class="cam-label">OFFICE_DESK_03 / CAM_06</div>
-        </div>
+        <div class="cam cam-01" data-cam="CAM_01"><div class="rec">REC</div><div class="cam-label">PRIVATE_SUITE / CAM_01</div></div>
+        <div class="cam cam-02" data-cam="CAM_02"><div class="rec">REC</div><div class="cam-label">SERVICE_CORRIDOR / CAM_02</div></div>
+        <div class="cam cam-03" data-cam="CAM_03"><div class="rec">REC</div><div class="cam-label">STAIRWELL_C2 / CAM_03</div></div>
+        <div class="cam cam-04" data-cam="CAM_04"><div class="rec">REC</div><div class="cam-label">REAR_ENTRANCE / CAM_04</div></div>
+        <div class="cam cam-05" data-cam="CAM_05"><div class="rec">REC</div><div class="cam-label">PARKING_LOT_A / CAM_05</div></div>
+        <div class="cam cam-06" data-cam="CAM_06"><div class="rec">REC</div><div class="cam-label">OFFICE_DESK_03 / CAM_06</div></div>
       </section>
 
-      <!-- RIGHT: STATUS -->
+      <!-- RIGHT -->
       <aside class="side-panel">
         <div class="panel">
           <h3>Current Focus</h3>
           <div id="label-viewer">None</div>
-          <div class="progress-wrap">
-            <div id="fix-progress" class="progress-bar"></div>
-          </div>
+          <div class="progress-wrap"><div id="fix-progress" class="progress-bar"></div></div>
         </div>
 
         <div class="panel">
@@ -100,11 +74,13 @@
       </aside>
     </main>
 
-    <!-- gaze dot -->
-    <div id="gaze-dot" aria-hidden="true"></div>
-
-    <!-- reused webcam overlay for ghost reflection -->
+    <div id="gaze-dot"></div>
     <video id="ghost-video" class="ghost-video" autoplay muted playsinline></video>
+
+    <!-- PSYCHOLOGICAL FINAL LINE -->
+    <div id="final-message" class="final-message">
+      You were observed longer than you think.
+    </div>
   </section>
 
   <script src="main.js"></script>
