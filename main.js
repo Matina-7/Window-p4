@@ -1,157 +1,127 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
+(() => {
+  const wallGrid = document.getElementById('wall-grid');
+  const labelViewer = document.getElementById('label-viewer');
+  const scoreVoyeur = document.getElementById('score-voyeur');
+  const fixProgress = document.getElementById('fix-progress');
+  const mainVideo = document.getElementById('main-video');
+  const gazeDot = document.getElementById('gaze-dot');
 
-body {
-  background: #05060a;
-  color: #e5e5e5;
-  font-family: system-ui, sans-serif;
-  height: 100vh;
-  overflow: hidden;
-}
+  const CFG = {
+    triggerTime: 2.0,
+    ghostTime: 2.2,
+    tickMs: 50
+  };
 
-/* scenes */
-.scene { position: absolute; inset: 0; display: none; }
-.scene.active { display: flex; }
+  const state = {
+    cams: [],
+    current: null,
+    fixation: 0,
+    viewer: null,
+    ghosted: false,
+    score: 0,
+    gaze: { x: 0, y: 0 }
+  };
 
-/* buttons */
-.btn {
-  padding: 10px 18px;
-  border-radius: 8px;
-  border: 1px solid #444;
-  background: #151725;
-  color: white;
-  cursor: pointer;
-}
-.btn.primary { background: #e53935; }
+  function createWall() {
+    const camIds = ['CAM_01','CAM_02','CAM_03','CAM_04','CAM_05','CAM_06'];
+    wallGrid.innerHTML = '';
+    state.cams = [];
 
-/* top bar */
-.top-bar {
-  height: 48px;
-  border-bottom: 1px solid #222;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-}
-
-/* layout */
-.wall-layout {
-  flex: 1;
-  display: flex;
-  height: calc(100vh - 48px);
-}
-
-/* LEFT MAIN VIEWER */
-.main-viewer {
-  width: 40%;
-  background: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-right: 1px solid #222;
-}
-
-.main-viewer video {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-/* RIGHT SIDE */
-.right-area {
-  flex: 1;
-  display: flex;
-}
-
-/* GRID */
-.wall-grid {
-  flex: 3;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 12px;
-}
-
-.cam-window {
-  position: relative;
-  border: 1px solid #333;
-  background: #0b0d18;
-  border-radius: 8px;
-}
-
-/* immediate gaze highlight */
-.cam-window.gaze-enter {
-  border-color: #ef5350;
-  box-shadow: 0 0 0 2px rgba(239,83,80,0.4);
-}
-
-.cam-label {
-  position: absolute;
-  bottom: 6px;
-  left: 6px;
-  font-size: 11px;
-  background: rgba(0,0,0,0.6);
-  padding: 3px 6px;
-  border-radius: 6px;
-}
-
-/* SIDE PANEL */
-.side-panel {
-  width: 220px;
-  border-left: 1px solid #222;
-  padding: 10px;
-}
-
-.panel-block {
-  border: 1px solid #333;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
-
-.score {
-  font-size: 24px;
-  color: #ef5350;
-}
-
-/* fixation bar */
-.fix-bar {
-  height: 6px;
-  background: #222;
-  border-radius: 999px;
-  overflow: hidden;
-  margin-top: 6px;
-}
-#fix-progress {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #ef5350, #ff867c);
-}
-
-/* gaze dot */
-#gaze-dot {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(239,83,80,0.4);
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-}
-
-/* calibration */
-.calibration {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: flex;
-}
-.calibration.hidden { display: none; }
-
-/* HEARTBEAT */
-.system-heartbeat {
-  animation: heartbeat 0.35s ease-out;
-}
-@keyframes heartbeat {
-  30% {
-    box-shadow: inset 0 0 0 9999px rgba(239,83,80,0.12);
+    camIds.forEach(id => {
+      const el = document.createElement('div');
+      el.className = 'cam-window';
+      el.innerHTML = `<div class="cam-label">${id}</div>`;
+      wallGrid.appendChild(el);
+      state.cams.push({ id, el });
+    });
   }
-}
+
+  function hitTest(x, y) {
+    return state.cams.find(c => {
+      const r = c.el.getBoundingClientRect();
+      return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+    });
+  }
+
+  async function openMainViewer(camId) {
+    if (state.viewer === camId) return;
+
+    mainVideo.pause();
+    mainVideo.src = '';
+    mainVideo.srcObject = null;
+
+    if (camId === 'CAM_01') {
+      mainVideo.src = 'suit.mov';
+      await mainVideo.play();
+    }
+
+    if (camId === 'CAM_02') {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      mainVideo.srcObject = stream;
+      await mainVideo.play();
+    }
+
+    state.viewer = camId;
+  }
+
+  function loop() {
+    gazeDot.style.left = state.gaze.x + 'px';
+    gazeDot.style.top = state.gaze.y + 'px';
+
+    const hit = hitTest(state.gaze.x, state.gaze.y);
+    state.cams.forEach(c => c.el.classList.remove('gaze-enter'));
+
+    if (!hit) {
+      state.current = null;
+      state.fixation = 0;
+      fixProgress.style.width = '0%';
+      labelViewer.textContent = 'None';
+      return setTimeout(loop, CFG.tickMs);
+    }
+
+    hit.el.classList.add('gaze-enter');
+
+    if (hit !== state.current) {
+      state.current = hit;
+      state.fixation = 0;
+      state.ghosted = false;
+    }
+
+    state.fixation += CFG.tickMs / 1000;
+    labelViewer.textContent = `${hit.id} – ${state.fixation.toFixed(2)}s`;
+    fixProgress.style.width =
+      Math.min(state.fixation / CFG.triggerTime, 1) * 100 + '%';
+
+    if (state.fixation >= CFG.triggerTime) {
+      openMainViewer(hit.id);
+    }
+
+    if (state.fixation >= CFG.ghostTime && !state.ghosted) {
+      state.ghosted = true;
+      document.body.classList.add('system-heartbeat');
+      setTimeout(() => document.body.classList.remove('system-heartbeat'), 350);
+    }
+
+    state.score += CFG.tickMs / 1000;
+    scoreVoyeur.textContent = Math.floor(state.score);
+
+    setTimeout(loop, CFG.tickMs);
+  }
+
+  function initGaze() {
+    webgazer.setGazeListener(data => {
+      if (!data) return;
+      state.gaze.x = data.x;
+      state.gaze.y = data.y;
+    }).begin();
+
+    webgazer.showVideo(false);
+    webgazer.showFaceOverlay(false);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    createWall();
+    initGaze();
+    loop();
+  });
+})();
