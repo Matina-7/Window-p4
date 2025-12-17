@@ -9,46 +9,110 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WINDOW / Monitor System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WINDOW - Monitor System</title>
 
   <link rel="stylesheet" href="style.css" />
+
+  <!-- WebGazer.js -->
   <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 </head>
-
 <body>
 
-<header class="top-bar">
-  <div>WINDOW / CCTV GRID</div>
-  <div>EYE: ACTIVE · MODE: OBSERVATION</div>
-</header>
+  <!-- Scene 1: Loading -->
+  <div id="scene-loading" class="scene active">
+    <div class="loading-center">
+      <div class="system-title">WINDOW // MONITOR SYSTEM</div>
 
-<main class="layout">
+      <!-- ❗ 不再用 Typed.js -->
+      <div id="loading-text" class="loading-text">
+        Initializing monitoring system...
+      </div>
 
-  <!-- LEFT MAIN VIEWER -->
-  <div id="main-viewer" class="main-viewer">
-    <video id="main-video" autoplay muted playsinline></video>
+      <button id="btn-start" class="btn primary">
+        Start System Calibration
+      </button>
+    </div>
   </div>
 
-  <!-- CCTV GRID -->
-  <div id="wall-grid" class="wall-grid"></div>
+  <!-- Scene 2: CCTV Wall -->
+  <div id="scene-wall" class="scene">
+    <header class="top-bar">
+      <div class="logo">WINDOW / CCTV GRID</div>
+      <div class="status">
+        <span>EYE: ACTIVE</span>
+        <span>MODE: OBSERVATION</span>
+      </div>
+    </header>
 
-  <!-- SIDE PANEL -->
-  <aside class="side-panel">
-    <div class="panel">
-      <h3>Current Focus</h3>
-      <div id="label-viewer">None</div>
+    <main class="wall-layout">
+      <section class="wall-grid" id="wall-grid"></section>
+
+      <aside class="side-panel">
+        <div class="panel-block">
+          <h3>Current Focus</h3>
+          <div id="label-viewer">None</div>
+        </div>
+
+        <div class="panel-block">
+          <h3>Voyeur Score</h3>
+          <div id="score-voyeur" class="panel-text-large">0</div>
+        </div>
+
+        <div class="panel-block">
+          <button id="btn-to-logs" class="btn">
+            Enter Log Console
+          </button>
+        </div>
+      </aside>
+    </main>
+
+    <div id="gaze-dot"></div>
+  </div>
+
+  <!-- Scene 3: Logs -->
+  <div id="scene-logs" class="scene">
+    <header class="top-bar">
+      <div class="logo">WINDOW / LOG CONSOLE</div>
+    </header>
+
+    <main class="logs-layout">
+      <section class="logs-panel">
+        <div id="log-lines" class="log-lines"></div>
+      </section>
+
+      <aside class="side-panel">
+        <div class="panel-block">
+          <button id="btn-to-report" class="btn">
+            Generate Surveillance Report
+          </button>
+        </div>
+      </aside>
+    </main>
+
+    <div id="gaze-dot-logs"></div>
+  </div>
+
+  <!-- Scene 4: Report -->
+  <div id="scene-report" class="scene">
+    <div class="report-center">
+      <h1>Surveillance Behavior Report</h1>
+      <div id="report-text"></div>
+      <button id="btn-restart" class="btn">Restart</button>
     </div>
-    <div class="panel">
-      <h3>Voyeur Score</h3>
-      <div id="score-voyeur">0</div>
+  </div>
+
+  <!-- Calibration Overlay -->
+  <div id="calibration-overlay" class="calibration hidden">
+    <div class="calib-box">
+      <h2>Calibration</h2>
+      <p>Please look at the center of the screen.</p>
+      <button id="btn-calib-start" class="btn primary">
+        Begin
+      </button>
     </div>
-  </aside>
+  </div>
 
-</main>
-
-<div id="gaze-dot"></div>
-
-<script src="main.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
