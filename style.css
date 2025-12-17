@@ -442,7 +442,6 @@ body.ghost-heartbeat::before{
   opacity:1;
   background: rgba(255,255,255,0.08);
 }
-
 /* ===== GHOST AFTERMATH ===== */
 body.post-ghost {
   filter: contrast(1.05) saturate(1.1);
