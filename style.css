@@ -1,8 +1,7 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* =========================
+   GLOBAL
+========================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
@@ -12,53 +11,42 @@ body {
   overflow: hidden;
 }
 
-/* 场景切换 */
-.scene {
-  position: absolute;
-  inset: 0;
-  display: none;
-}
-.scene.active {
-  display: flex;
-}
+.scene { position: absolute; inset: 0; display: none; }
+.scene.active { display: flex; }
 
-/* 按钮 */
 .btn {
   padding: 10px 18px;
-  border-radius: 4px;
-  border: 1px solid #555;
-  background: #151820;
+  border-radius: 6px;
+  border: 1px solid #3a3a44;
+  background: #141621;
   color: #e5e5e5;
   cursor: pointer;
   font-size: 14px;
+  transition: transform 0.1s, filter 0.2s;
 }
-.btn.primary {
-  background: #e53935;
-  border-color: #e53935;
-}
+.btn.primary { background: #e53935; border-color: #e53935; }
+.btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
 
-/* 加载页 */
-.loading-center {
-  margin: auto;
-  text-align: center;
-}
+.loading-center { margin: auto; text-align: center; }
 .system-title {
   font-size: 18px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   color: #9fa8da;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 .loading-text {
-  min-height: 40px;
-  margin-bottom: 24px;
-  font-family: monospace;
+  min-height: 38px;
+  margin-bottom: 20px;
+  font-family: ui-monospace, Menlo, monospace;
   color: #c5cae9;
 }
 
-/* 顶栏 */
+/* =========================
+   TOP BAR
+========================= */
 .top-bar {
   height: 52px;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #1f2230;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -68,6 +56,7 @@ body {
 .logo {
   font-size: 13px;
   letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: #b0bec5;
 }
 .status span {
@@ -76,107 +65,78 @@ body {
   color: #90a4ae;
 }
 
-/* 主体布局 */
+/* =========================
+   WALL LAYOUT
+========================= */
 .wall-layout {
   flex: 1;
   display: flex;
   height: calc(100vh - 52px);
 }
 
-/* 🔴 关键改动：监控格子 = 3 列 × 2 行 */
+/* 6 windows: 3 cols */
 .wall-grid {
   flex: 3;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 1fr;
-  gap: 8px;
+  gap: 10px;
   padding: 12px;
   background: radial-gradient(circle at top, #151824 0, #05060a 60%);
 }
 
 .cam-window {
   position: relative;
-  border: 1px solid #272a35;
-  background: #000;
+  border-radius: 10px;
+  border: 1px solid #26293a;
+  background: #070812;
+  overflow: hidden;
+  transform: translateZ(0);
+  transition: transform 0.18s, box-shadow 0.18s, filter 0.18s, border-color 0.18s;
 }
+
 .cam-window-inner {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1e1e2f, #0d0f1a);
-  filter: grayscale(0.5);
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1b1d2c, #090a12);
+  filter: grayscale(0.45) contrast(1.08);
 }
+
+/* subtle noise texture */
+.cam-window-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.03), rgba(255,255,255,0.03) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode: overlay;
+}
+
 .cam-label {
   position: absolute;
-  bottom: 6px;
-  left: 6px;
-  font-size: 10px;
-  background: rgba(0,0,0,0.7);
-  padding: 2px 4px;
+  left: 10px;
+  bottom: 10px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  font-family: ui-monospace, Menlo, monospace;
+  background: rgba(0,0,0,0.55);
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.06);
 }
+
 .cam-rec {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  font-size: 10px;
+  right: 10px;
+  top: 10px;
+  font-size: 11px;
+  font-family: ui-monospace, Menlo, monospace;
   color: #ef5350;
-}
-
-/* 侧边栏 */
-.side-panel {
-  flex: 1;
-  border-left: 1px solid #222;
-  padding: 10px;
-  background: #05070f;
-}
-.panel-block {
-  border: 1px solid #202331;
-  margin-bottom: 10px;
-  padding: 10px;
-  background: #080a13;
-}
-.panel-text-large {
-  font-size: 26px;
-  color: #ef5350;
-}
-
-/* 眼动点 */
-#gaze-dot,
-#gaze-dot-logs {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(244,67,54,0.4);
-  border: 1px solid rgba(255,82,82,0.8);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 9999;
-  display: none;
-}
-
-/* 校准 */
-.calibration {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: flex;
-}
-.calibration.hidden {
-  display: none;
-}
-.calib-box {
-  margin: auto;
-  padding: 20px;
-  background: #101322;
-  border: 1px solid #303240;
-}
-.cam-window {
-  transition: filter 0.3s, box-shadow 0.3s;
-}
-
-.cam-window.gaze-focus {
-  filter: brightness(1.15) contrast(1.1);
-  box-shadow: 0 0 12px rgba(255, 80, 80, 0.35);
+  background: rgba(0,0,0,0.45);
+  padding: 3px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(239,83,80,0.28);
 }
 
 .cam-overlay {
@@ -185,128 +145,235 @@ body {
   pointer-events: none;
   opacity: 0;
 }
-[data-type="PRIVATE_SUITE"].gaze-lv1 {
-  filter: brightness(1.2);
+
+/* =========================
+   SIDE PANEL
+========================= */
+.side-panel {
+  flex: 1;
+  border-left: 1px solid #1f2230;
+  padding: 10px;
+  background: #05070f;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.panel-block {
+  border: 1px solid #202331;
+  border-radius: 10px;
+  padding: 10px;
+  background: #080a13;
+}
+.panel-block h3 {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #cfd8dc;
+}
+.panel-text { font-size: 12px; color: #90a4ae; }
+.panel-text-large { font-size: 26px; font-weight: 650; color: #ef5350; }
+
+/* =========================
+   LOGS
+========================= */
+.logs-layout { flex: 1; display: flex; height: calc(100vh - 52px); }
+.logs-panel { flex: 3; padding: 10px; background: #05060a; }
+.log-lines {
+  height: 100%;
+  border: 1px solid #222;
+  border-radius: 10px;
+  padding: 10px;
+  overflow-y: auto;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+}
+.log-line { padding: 3px 0; color: #9e9e9e; }
+.log-line.sensitive { color: #ffcc80; }
+
+/* =========================
+   REPORT
+========================= */
+.report-center {
+  margin: auto;
+  max-width: 700px;
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid #303240;
+  background: radial-gradient(circle at top, #151824 0, #05060a 60%);
+}
+.report-center h1 { font-size: 22px; margin-bottom: 12px; }
+#report-text { font-size: 14px; line-height: 1.65; color: #cfd8dc; margin-bottom: 16px; }
+
+/* =========================
+   GAZE DOT
+========================= */
+#gaze-dot, #gaze-dot-logs {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(244,67,54,0.35);
+  border: 1px solid rgba(255,82,82,0.85);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+  display: none;
+  filter: drop-shadow(0 0 8px rgba(244,67,54,0.25));
 }
 
-[data-type="PRIVATE_SUITE"].gaze-lv2 {
-  animation: suite-breathe 2s infinite;
+/* =========================
+   CALIBRATION
+========================= */
+.calibration {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+}
+.calibration.hidden { display: none; }
+.calib-box {
+  margin: auto;
+  padding: 20px;
+  background: #101322;
+  border-radius: 12px;
+  border: 1px solid #303240;
+  text-align: center;
+}
+.calib-box h2 { margin-bottom: 10px; }
+.calib-box p { font-size: 13px; color: #b0bec5; margin-bottom: 12px; }
+
+/* =========================
+   INTERACTIVE REACTION LAYER
+   Classes injected by JS:
+   .gaze-focus, .gaze-lv1, .gaze-lv2, .gaze-lv3, .gaze-ghost
+========================= */
+.cam-window.gaze-focus {
+  transform: scale(1.01);
+  border-color: rgba(239,83,80,0.55);
+  box-shadow: 0 0 18px rgba(239,83,80,0.18);
+  filter: brightness(1.06);
 }
 
-@keyframes suite-breathe {
-  0% { filter: brightness(1.15); }
-  50% { filter: brightness(1.3); }
-  100% { filter: brightness(1.15); }
+.cam-window.gaze-lv1 {
+  box-shadow: 0 0 26px rgba(239,83,80,0.25);
 }
 
+.cam-window.gaze-lv2 .cam-window-inner {
+  filter: grayscale(0.25) contrast(1.18) brightness(1.1);
+}
+
+.cam-window.gaze-lv3 .cam-overlay {
+  opacity: 1;
+}
+
+/* Ghost flash */
+.cam-window.gaze-ghost .cam-overlay {
+  opacity: 1;
+  animation: ghostFlash 0.22s linear;
+  background: rgba(255,255,255,0.16);
+}
+@keyframes ghostFlash {
+  0% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+/* =========================
+   CAMERA-SPECIFIC MICRO ANIMATIONS
+   Based on data-type
+========================= */
+
+/* CAM_01 PRIVATE_SUITE: warm light + breathing + shadow pass */
+[data-type="PRIVATE_SUITE"].gaze-lv1 .cam-window-inner {
+  filter: grayscale(0.25) brightness(1.12) contrast(1.08);
+}
+[data-type="PRIVATE_SUITE"].gaze-lv2 .cam-window-inner {
+  animation: suiteBreath 1.9s ease-in-out infinite;
+}
+@keyframes suiteBreath {
+  0%, 100% { filter: grayscale(0.25) brightness(1.08) contrast(1.08); }
+  50% { filter: grayscale(0.18) brightness(1.22) contrast(1.12); }
+}
 [data-type="PRIVATE_SUITE"].gaze-lv3 .cam-overlay {
+  background: radial-gradient(circle at 75% 78%, rgba(0,0,0,0.55), transparent 60%);
+}
+
+/* CAM_02 SERVICE_CORRIDOR: distant movement + glitch pixels */
+[data-type="SERVICE_CORRIDOR"].gaze-lv1 .cam-window-inner::after {
+  opacity: 0.26;
+}
+[data-type="SERVICE_CORRIDOR"].gaze-lv2 .cam-overlay {
   opacity: 1;
-  background: radial-gradient(circle at 70% 80%, rgba(0,0,0,0.5), transparent 60%);
+  background:
+    linear-gradient(0deg, rgba(255,255,255,0.03), transparent),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 6px);
+  animation: corridorGlitch 0.55s steps(2) infinite;
+}
+@keyframes corridorGlitch {
+  0% { transform: translateX(0); filter: contrast(1.0); }
+  50% { transform: translateX(-2px); filter: contrast(1.35); }
+  100% { transform: translateX(1px); filter: contrast(1.05); }
+}
+[data-type="SERVICE_CORRIDOR"].gaze-lv3 .cam-window-inner {
+  filter: contrast(1.35) brightness(1.08);
 }
 
-[data-type="PRIVATE_SUITE"].gaze-ghost .cam-overlay {
-  opacity: 1;
-  background: rgba(255,255,255,0.15);
-  animation: ghost-flash 0.2s;
+/* CAM_03 STAIRWELL_C2: flicker + faint silhouette */
+[data-type="STAIRWELL_C2"].gaze-lv1 .cam-window-inner {
+  animation: stairFlicker 0.6s infinite;
 }
-[data-type="SERVICE_CORRIDOR"].gaze-lv1 {
-  filter: brightness(1.1);
+@keyframes stairFlicker {
+  0%, 100% { filter: grayscale(0.55) brightness(0.95) contrast(1.1); }
+  50% { filter: grayscale(0.35) brightness(1.15) contrast(1.15); }
 }
-
-[data-type="SERVICE_CORRIDOR"].gaze-lv2 {
-  background-image: repeating-linear-gradient(
-    0deg,
-    rgba(255,255,255,0.05),
-    rgba(255,255,255,0.05) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-}
-
-[data-type="SERVICE_CORRIDOR"].gaze-lv3 {
-  filter: contrast(1.4);
-}
-
-[data-type="SERVICE_CORRIDOR"].gaze-ghost {
-  animation: corridor-flash 0.15s;
-}
-
-@keyframes corridor-flash {
-  from { filter: brightness(2); }
-  to { filter: brightness(1); }
-}
-[data-type="STAIRWELL_C2"].gaze-lv1 {
-  animation: stair-flicker 0.6s infinite;
-}
-
-@keyframes stair-flicker {
-  0%, 100% { filter: brightness(0.9); }
-  50% { filter: brightness(1.2); }
-}
-
 [data-type="STAIRWELL_C2"].gaze-lv3 .cam-overlay {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent 65%);
+}
+
+/* CAM_04 REAR_ENTRANCE: wind scan + door crack brightness */
+[data-type="REAR_ENTRANCE"].gaze-lv1 .cam-overlay {
   opacity: 1;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 1px, transparent 1px, transparent 4px);
+  animation: rearWind 1.2s linear infinite;
 }
-
-[data-type="STAIRWELL_C2"].gaze-ghost {
-  animation: ghost-flash 0.2s;
+@keyframes rearWind {
+  0% { transform: translateY(-4px); opacity: 0.35; }
+  100% { transform: translateY(4px); opacity: 0.2; }
 }
-[data-type="REAR_ENTRANCE"].gaze-lv1 {
-  background-image: linear-gradient(
-    to right,
-    rgba(255,255,255,0.05),
-    transparent
-  );
+[data-type="REAR_ENTRANCE"].gaze-lv2 .cam-window-inner {
+  filter: brightness(1.22) contrast(1.15);
 }
-
-[data-type="REAR_ENTRANCE"].gaze-lv2 {
-  filter: brightness(1.25);
-}
-
 [data-type="REAR_ENTRANCE"].gaze-lv3 .cam-overlay {
   opacity: 1;
-  background: rgba(0,0,0,0.4);
+  background: radial-gradient(circle at 15% 55%, rgba(255,255,255,0.12), transparent 55%);
 }
 
-[data-type="REAR_ENTRANCE"].gaze-ghost {
-  animation: ghost-flash 0.2s;
+/* CAM_05 PARKING_LOT_A: autofocus scanlines + far reflection */
+[data-type="PARKING_LOT_A"].gaze-lv1 .cam-window-inner::after {
+  opacity: 0.3;
 }
-[data-type="PARKING_LOT_A"].gaze-lv1 {
-  filter: contrast(1.2);
-}
-
-[data-type="PARKING_LOT_A"].gaze-lv2 {
-  box-shadow: inset 0 0 20px rgba(255,255,255,0.15);
-}
-
-[data-type="PARKING_LOT_A"].gaze-lv3 .cam-overlay {
+[data-type="PARKING_LOT_A"].gaze-lv2 .cam-overlay {
   opacity: 1;
-  background: radial-gradient(circle at center, rgba(0,0,0,0.5), transparent);
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.05), rgba(255,255,255,0.05) 1px, transparent 1px, transparent 3px);
+  animation: parkScan 0.75s linear infinite;
+}
+@keyframes parkScan {
+  0% { transform: translateY(-3px); }
+  100% { transform: translateY(3px); }
+}
+[data-type="PARKING_LOT_A"].gaze-lv3 .cam-overlay {
+  background: radial-gradient(circle at 78% 30%, rgba(255,255,255,0.10), transparent 45%);
 }
 
-[data-type="PARKING_LOT_A"].gaze-ghost {
-  animation: ghost-flash 0.2s;
+/* CAM_06 OFFICE_DESK_03: monitor wakes + reflection hint */
+[data-type="OFFICE_DESK_03"].gaze-lv1 .cam-window-inner {
+  filter: brightness(1.08) contrast(1.12);
 }
-[data-type="OFFICE_DESK_03"].gaze-lv1 {
-  filter: brightness(1.15);
+[data-type="OFFICE_DESK_03"].gaze-lv2 .cam-overlay {
+  opacity: 1;
+  background: linear-gradient(to top, rgba(255,255,255,0.06), transparent 55%);
 }
-
-[data-type="OFFICE_DESK_03"].gaze-lv2 {
-  filter: contrast(1.3);
-}
-
 [data-type="OFFICE_DESK_03"].gaze-lv3 .cam-overlay {
   opacity: 1;
-  background: rgba(255,255,255,0.08);
-}
-
-[data-type="OFFICE_DESK_03"].gaze-ghost .cam-overlay {
-  opacity: 1;
-  background: rgba(255,255,255,0.2);
-  animation: ghost-flash 0.2s;
-}
-@keyframes ghost-flash {
-  from { opacity: 0.8; }
-  to { opacity: 0; }
+  background: radial-gradient(circle at 55% 45%, rgba(255,255,255,0.10), transparent 55%);
 }
