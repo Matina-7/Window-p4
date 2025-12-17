@@ -6,37 +6,32 @@
   <title>WINDOW – Monitor System</title>
 
   <link rel="stylesheet" href="style.css" />
-
-  <!-- WebGazer -->
   <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 </head>
 <body>
 
-  <!-- LOADING -->
-  <div id="scene-loading" class="scene active">
-    <div class="center">
-      <h1>WINDOW // MONITOR SYSTEM</h1>
-      <button id="btn-start" class="btn primary">Start Calibration</button>
-    </div>
-  </div>
+  <!-- MONITOR WALL -->
+  <div id="scene-wall" class="scene active">
 
-  <!-- WALL -->
-  <div id="scene-wall" class="scene">
     <header class="top-bar">
       <div class="logo">WINDOW / CCTV GRID</div>
+      <div class="status">EYE: ACTIVE · MODE: OBSERVATION</div>
     </header>
 
     <div class="wall-layout">
 
-      <!-- LEFT MAIN VIEWER (你画红叉的区域) -->
+      <!-- LEFT MAIN VIEWER -->
       <div id="main-viewer" class="main-viewer">
         <video id="main-video" autoplay playsinline></video>
       </div>
 
-      <!-- RIGHT GRID -->
+      <!-- RIGHT SIDE -->
       <div class="right-area">
+
+        <!-- CCTV GRID -->
         <section id="wall-grid" class="wall-grid"></section>
 
+        <!-- SIDE PANEL -->
         <aside class="side-panel">
           <div class="panel-block">
             <h3>Current Focus</h3>
@@ -51,18 +46,12 @@
             <div id="score-voyeur" class="score">0</div>
           </div>
         </aside>
+
       </div>
     </div>
 
+    <!-- GAZE DOT -->
     <div id="gaze-dot"></div>
-  </div>
-
-  <!-- CALIBRATION -->
-  <div id="calibration-overlay" class="calibration hidden">
-    <div class="center">
-      <p>Look at the center of the screen</p>
-      <button id="btn-calib-start" class="btn primary">Begin</button>
-    </div>
   </div>
 
   <script src="main.js"></script>
