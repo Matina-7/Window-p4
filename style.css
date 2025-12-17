@@ -1,71 +1,279 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WINDOW</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+/* 通用样式 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-<body>
-  <!-- Scene: Start -->
-  <section id="scene-start" class="scene active">
-    <div class="center">
-      <div class="title">WINDOW // MONITOR SYSTEM</div>
-      <div class="subtitle">Anti-surveillance interface prototype</div>
-      <button id="btn-start" class="btn primary">Enter CCTV Wall</button>
-      <div class="hint">If the button works, we are ready for the next step.</div>
-    </div>
-  </section>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  background: #05060a;
+  color: #e5e5e5;
+  height: 100vh;
+  overflow: hidden;
+}
 
-  <!-- Scene: Wall -->
-  <section id="scene-wall" class="scene">
-    <header class="topbar">
-      <div class="brand">WINDOW / CCTV GRID</div>
-      <div class="status">
-        <span id="status-eye">EYE: OFF</span>
-        <span id="status-mode">MODE: MANUAL</span>
-      </div>
-    </header>
+/* 场景切换基础 */
+.scene {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
 
-    <main class="layout">
-      <section id="wall-grid" class="grid"></section>
+.scene.active {
+  display: flex;
+}
 
-      <aside class="panel">
-        <div class="card">
-          <div class="card-title">Current Window</div>
-          <div id="label" class="card-value">None</div>
-        </div>
+/* 按钮 */
+.btn {
+  padding: 10px 18px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: #151820;
+  color: #e5e5e5;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s, transform 0.1s;
+}
 
-        <div class="card">
-          <div class="card-title">Voyeur Score</div>
-          <div id="score" class="score">0</div>
-        </div>
+.btn.primary {
+  background: #e53935;
+  border-color: #e53935;
+}
 
-        <div class="card">
-          <button id="btn-logs" class="btn">Open Logs</button>
-        </div>
-      </aside>
-    </main>
+.btn:hover {
+  background: #272a35;
+  transform: translateY(-1px);
+}
 
-    <div id="gaze-dot" aria-hidden="true"></div>
-  </section>
+/* 场景 1：加载画面 */
+.loading-center {
+  margin: auto;
+  text-align: center;
+}
 
-  <!-- Scene: Logs -->
-  <section id="scene-logs" class="scene">
-    <header class="topbar">
-      <div class="brand">WINDOW / LOG CONSOLE</div>
-      <div class="status">
-        <span id="status-log">STATUS: READY</span>
-        <button id="btn-back" class="btn">Back</button>
-      </div>
-    </header>
+.system-title {
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  color: #9fa8da;
+  margin-bottom: 24px;
+}
 
-    <main class="logs">
-      <div id="logbox" class="logbox"></div>
-    </main>
-  </section>
+.loading-text {
+  min-height: 40px;
+  margin-bottom: 24px;
+  font-family: "SF Mono", Menlo, monospace;
+  color: #c5cae9;
+}
 
-  <script src="main.js"></script>
-</body>
-</html>
+/* 顶部条 */
+.top-bar {
+  height: 52px;
+  border-bottom: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: linear-gradient(to right, #05060a, #101322);
+}
+
+.logo {
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #b0bec5;
+}
+
+.status span {
+  margin-left: 12px;
+  font-size: 12px;
+  color: #90a4ae;
+}
+
+/* 监控墙布局 */
+.wall-layout {
+  flex: 1;
+  display: flex;
+  height: calc(100vh - 52px);
+}
+
+.wall-grid {
+  flex: 3;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 6px;
+  padding: 8px;
+  background: radial-gradient(circle at top, #151824 0, #05060a 60%);
+}
+
+.cam-window {
+  position: relative;
+  background: #05060a;
+  border: 1px solid #272a35;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.cam-window-inner {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(0.4) contrast(1.1);
+}
+
+.cam-label {
+  position: absolute;
+  left: 6px;
+  bottom: 4px;
+  font-size: 10px;
+  font-family: "SF Mono", Menlo, monospace;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.cam-rec {
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  font-size: 10px;
+  font-family: "SF Mono", Menlo, monospace;
+  color: #ef5350;
+}
+
+/* 右侧信息面板 */
+.side-panel {
+  flex: 1;
+  border-left: 1px solid #222;
+  background: #05070f;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel-block {
+  border: 1px solid #202331;
+  border-radius: 4px;
+  padding: 10px;
+  background: #080a13;
+}
+
+.panel-block h3 {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #cfd8dc;
+}
+
+.panel-text {
+  font-size: 12px;
+  color: #90a4ae;
+}
+
+.panel-text-large {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ef5350;
+}
+
+/* 日志场景布局 */
+.logs-layout {
+  flex: 1;
+  display: flex;
+  height: calc(100vh - 52px);
+}
+
+.logs-panel {
+  flex: 3;
+  padding: 10px;
+  background: #05060a;
+}
+
+.log-lines {
+  height: 100%;
+  border: 1px solid #222;
+  border-radius: 4px;
+  padding: 8px;
+  overflow-y: auto;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+}
+
+.log-line {
+  padding: 2px 0;
+  color: #9e9e9e;
+}
+
+.log-line.sensitive {
+  color: #ffcc80;
+}
+
+/* 报告场景 */
+.report-center {
+  margin: auto;
+  max-width: 620px;
+  padding: 24px;
+  border-radius: 6px;
+  border: 1px solid #303240;
+  background: radial-gradient(circle at top, #151824 0, #05060a 60%);
+}
+
+.report-center h1 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.report-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #cfd8dc;
+  margin-bottom: 20px;
+}
+
+/* 眼动小点 */
+#gaze-dot,
+#gaze-dot-logs {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 82, 82, 0.7);
+  background: rgba(244, 67, 54, 0.3);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  display: none;
+}
+
+/* 校准层 */
+.calibration {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+}
+
+.calibration.hidden {
+  display: none;
+}
+
+.calib-box {
+  margin: auto;
+  padding: 20px;
+  background: #101322;
+  border-radius: 4px;
+  border: 1px solid #303240;
+  text-align: center;
+}
+
+.calib-box h2 {
+  margin-bottom: 10px;
+}
+
+.calib-box p {
+  font-size: 13px;
+  color: #b0bec5;
+  margin-bottom: 12px;
+}
