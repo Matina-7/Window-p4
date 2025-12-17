@@ -1,84 +1,84 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WINDOW - 反窥视监控系统</title>
+  <title>WINDOW - Monitor System</title>
 
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Typed.js 打字机效果（以后用在加载文字、日志等） -->
-  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.16"></script>
-  <!-- WebGazer.js 眼动追踪 -->
+  <!-- WebGazer.js -->
   <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 </head>
 <body>
-  <!-- 场景 1：加载画面 -->
+
+  <!-- Scene 1: Loading -->
   <div id="scene-loading" class="scene active">
     <div class="loading-center">
       <div class="system-title">WINDOW // MONITOR SYSTEM</div>
-      <div id="loading-text" class="loading-text"></div>
-      <button id="btn-start" class="btn primary">开始系统校准</button>
+
+      <!-- ❗ 不再用 Typed.js -->
+      <div id="loading-text" class="loading-text">
+        Initializing monitoring system...
+      </div>
+
+      <button id="btn-start" class="btn primary">
+        Start System Calibration
+      </button>
     </div>
   </div>
 
-  <!-- 场景 2：监控墙 -->
+  <!-- Scene 2: CCTV Wall -->
   <div id="scene-wall" class="scene">
     <header class="top-bar">
       <div class="logo">WINDOW / CCTV GRID</div>
       <div class="status">
-        <span id="status-eye">EYE: INIT</span>
-        <span id="status-mode">MODE: IDLE</span>
+        <span>EYE: ACTIVE</span>
+        <span>MODE: OBSERVATION</span>
       </div>
     </header>
 
     <main class="wall-layout">
-      <section class="wall-grid" id="wall-grid">
-        <!-- JS 里动态生成一堆小监控窗口 -->
-      </section>
+      <section class="wall-grid" id="wall-grid"></section>
 
       <aside class="side-panel">
         <div class="panel-block">
-          <h3>当前观察标签</h3>
-          <div id="label-viewer" class="panel-text">尚未确定</div>
+          <h3>Current Focus</h3>
+          <div id="label-viewer">None</div>
         </div>
+
         <div class="panel-block">
-          <h3>偷窥倾向指数</h3>
+          <h3>Voyeur Score</h3>
           <div id="score-voyeur" class="panel-text-large">0</div>
         </div>
+
         <div class="panel-block">
-          <button id="btn-to-logs" class="btn">进入日志后台</button>
+          <button id="btn-to-logs" class="btn">
+            Enter Log Console
+          </button>
         </div>
       </aside>
     </main>
 
-    <!-- 眼动位置小点 -->
     <div id="gaze-dot"></div>
   </div>
 
-  <!-- 场景 3：日志后台 -->
+  <!-- Scene 3: Logs -->
   <div id="scene-logs" class="scene">
     <header class="top-bar">
       <div class="logo">WINDOW / LOG CONSOLE</div>
-      <div class="status">
-        <span id="status-log-eye">EYE: TRACKING</span>
-        <span id="status-log-level">RISK: LOW</span>
-      </div>
     </header>
 
     <main class="logs-layout">
       <section class="logs-panel">
-        <div id="log-lines" class="log-lines">
-          <!-- JS 动态添加一行一行的日志 -->
-        </div>
+        <div id="log-lines" class="log-lines"></div>
       </section>
+
       <aside class="side-panel">
         <div class="panel-block">
-          <h3>注视敏感度</h3>
-          <div id="log-sensitivity" class="panel-text">等待数据...</div>
-        </div>
-        <div class="panel-block">
-          <button id="btn-to-report" class="btn">生成监控报告</button>
+          <button id="btn-to-report" class="btn">
+            Generate Surveillance Report
+          </button>
         </div>
       </aside>
     </main>
@@ -86,23 +86,23 @@
     <div id="gaze-dot-logs"></div>
   </div>
 
-  <!-- 场景 4：结局 / 报告 -->
+  <!-- Scene 4: Report -->
   <div id="scene-report" class="scene">
     <div class="report-center">
-      <h1>监控行为分析报告</h1>
-      <div id="report-text" class="report-text">
-        <!-- JS 根据你全过程的眼动数据生成一段文字 -->
-      </div>
-      <button id="btn-restart" class="btn">重新体验</button>
+      <h1>Surveillance Behavior Report</h1>
+      <div id="report-text"></div>
+      <button id="btn-restart" class="btn">Restart</button>
     </div>
   </div>
 
-  <!-- 校准提示（简单版） -->
+  <!-- Calibration Overlay -->
   <div id="calibration-overlay" class="calibration hidden">
     <div class="calib-box">
-      <h2>简单校准</h2>
-      <p>请看着屏幕中央，然后点击“开始”。</p>
-      <button id="btn-calib-start" class="btn primary">开始校准</button>
+      <h2>Calibration</h2>
+      <p>Please look at the center of the screen.</p>
+      <button id="btn-calib-start" class="btn primary">
+        Begin
+      </button>
     </div>
   </div>
 
