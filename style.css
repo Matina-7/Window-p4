@@ -1,28 +1,26 @@
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   background: #05060a;
   color: #e6e6e6;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: system-ui, sans-serif;
   overflow: hidden;
 }
 
-/* ================= TOP BAR ================= */
+/* ===== TOP BAR ===== */
 
 .top-bar {
   height: 48px;
+  padding: 0 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
   border-bottom: 1px solid #1c1f2a;
   background: #070812;
 }
 
-/* ================= LAYOUT ================= */
+/* ===== LAYOUT ===== */
 
 .layout {
   display: grid;
@@ -30,22 +28,20 @@ body {
   height: calc(100vh - 48px);
 }
 
-/* ================= MAIN VIEWER ================= */
+/* ===== MAIN VIEW ===== */
 
 .main-viewer {
   background: #000;
   border-right: 1px solid #1c1f2a;
-  position: relative;
 }
 
 .main-viewer video {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background: #000;
 }
 
-/* ================= WALL GRID ================= */
+/* ===== WALL GRID ===== */
 
 .wall-grid {
   display: grid;
@@ -56,13 +52,13 @@ body {
   min-width: 420px;
 }
 
-/* ================= CAMERA ================= */
+/* ===== CAM ===== */
 
 .cam {
   position: relative;
   background: linear-gradient(145deg, #0b0e18, #06070c);
-  border-radius: 12px;
   border: 1px solid #1e2230;
+  border-radius: 12px;
   min-height: 160px;
   overflow: hidden;
   transition: box-shadow 0.25s ease, filter 0.25s ease;
@@ -73,18 +69,15 @@ body {
   left: 10px;
   bottom: 10px;
   font-size: 12px;
-  opacity: 0.9;
 }
 
-/* ================= GAZE STATES ================= */
+/* ===== GAZE STATES ===== */
 
 .cam.gaze-enter {
   box-shadow: 0 0 0 2px #ff4040 inset;
 }
 
-.cam.level-1 {
-  filter: brightness(1.15);
-}
+.cam.level-1 { filter: brightness(1.15); }
 
 .cam.level-2 {
   animation: breathe 2s ease-in-out infinite;
@@ -112,15 +105,11 @@ body {
   to { box-shadow: 0 0 0 0 red inset; }
 }
 
-/* ================= SIDE PANEL ================= */
+/* ===== SIDE PANEL ===== */
 
 .side-panel {
   border-left: 1px solid #1c1f2a;
   padding: 12px;
-}
-
-.panel {
-  margin-bottom: 16px;
 }
 
 .panel h3 {
@@ -128,7 +117,7 @@ body {
   font-size: 14px;
 }
 
-/* ================= GAZE DOT ================= */
+/* ===== GAZE DOT ===== */
 
 #gaze-dot {
   position: fixed;
