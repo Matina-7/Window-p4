@@ -2,33 +2,28 @@ console.log('MAIN JS LOADED');
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ===== DOM ===== */
+  /* ================= DOM ================= */
+
+  const btnStart = document.getElementById('btn-start');
+  const sceneStart = document.getElementById('scene-start');
+  const sceneWall = document.getElementById('scene-wall');
+
   const wall = document.getElementById('wall-grid');
   const labelViewer = document.getElementById('label-viewer');
   const scoreEl = document.getElementById('score-voyeur');
   const gazeDot = document.getElementById('gaze-dot');
-  const btnStart = document.getElementById('btn-start');
 
   const mediaPanel = document.getElementById('media-panel');
   const mediaVideo = document.getElementById('media-video');
   const mediaClose = document.getElementById('media-close');
 
-  if (!wall || !btnStart) {
-    console.error('Required DOM missing');
+  if (!btnStart || !wall) {
+    console.error('Critical DOM missing');
     return;
   }
 
-  /* ===== CAM DATA ===== */
-  const CAMS = [
-    { id: 'CAM_01', name: 'PRIVATE_SUITE' },
-    { id: 'CAM_02', name: 'SERVICE_CORRIDOR' },
-    { id: 'CAM_03', name: 'STAIRWELL_C2' },
-    { id: 'CAM_04', name: 'REAR_ENTRANCE' },
-    { id: 'CAM_05', name: 'PARKING_LOT_A' },
-    { id: 'CAM_06', name: 'OFFICE_DESK_03' }
-  ];
+  /* ================= STATE（只在这里定义） ================= */
 
-  /* ===== STATE（一次性定义，绝对安全） ===== */
   const state = {
     gaze: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
     smooth: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
@@ -38,13 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
     voyeur: 0,
 
     ghostOccurred: false,
-    finalShown: false,
 
     cam01Played: false,
     cam02Played: false,
 
     running: false
   };
+
+  /* ================= THRESHOLDS ================= */
 
   const THRESH = {
     L1: 0.4,
@@ -54,27 +50,45 @@ document.addEventListener('DOMContentLoaded', () => {
     MEDIA: 3.0
   };
 
-  /* ===== BUILD WALL ===== */
+  /* ================= CAMERA DATA ================= */
+
+  const CAMS = [
+    { id: 'CAM_01', name: 'PRIVATE_SUITE' },
+    { id: 'CAM_02', name: 'SERVICE_CORRIDOR' },
+    { id: 'CAM_03', name: 'STAIRWELL_C2' },
+    { id: 'CAM_04', name: 'REAR_ENTRANCE' },
+    { id: 'CAM_05', name: 'PARKING_LOT_A' },
+    { id: 'CAM_06', name: 'OFFICE_DESK_03' }
+  ];
+
+  /* ================= BUILD WALL（一次） ================= */
+
   wall.innerHTML = '';
   CAMS.forEach(cam => {
     const el = document.createElement('div');
     el.className = 'cam';
     el.dataset.cam = cam.id;
-    el.innerHTML = `<div class="cam-label">${cam.name} / ${cam.id}</div>`;
+    el.innerHTML = `
+      <div class="cam-label">${cam.name} / ${cam.id}</div>
+    `;
     wall.appendChild(el);
   });
+
   const camEls = Array.from(document.querySelectorAll('.cam'));
 
-  /* ===== MEDIA ===== */
+  /* ================= MEDIA ================= */
+
   function closeMedia() {
-    mediaPanel.classList.remove('show');
+    mediaPanel?.classList.remove('show');
     mediaVideo.pause();
     mediaVideo.srcObject = null;
     mediaVideo.src = '';
   }
-  if (mediaClose) mediaClose.onclick = closeMedia;
 
-  /* ===== GAZE ===== */
+  mediaClose?.addEventListener('click', closeMedia);
+
+  /* ================= GAZE ================= */
+
   function smoothGaze() {
     state.smooth.x += (state.gaze.x - state.smooth.x) * 0.15;
     state.smooth.y += (state.gaze.y - state.smooth.y) * 0.15;
@@ -103,6 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => document.body.classList.remove('heartbeat'), 300);
   }
 
+  /* ================= MAIN LOOP ================= */
+
   let last = performance.now();
 
   function loop(t) {
@@ -112,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     last = t;
 
     smoothGaze();
+
     gazeDot.style.left = state.smooth.x + 'px';
     gazeDot.style.top = state.smooth.y + 'px';
 
@@ -144,8 +161,24 @@ document.addEventListener('DOMContentLoaded', () => {
         triggerHeartbeat();
       }
 
+      if (camId === 'CAM_01' && state.fixation >= THRESH.MEDIA && !state.cam01Played) {
+        mediaPanel.classList.add('show');
+        mediaVideo.src = 'suit.mov';
+        mediaVideo.play();
+        state.cam01Played = true;
+      }
+
+      if (camId === 'CAM_02' && state.fixation >= THRESH.MEDIA && !state.cam02Played) {
+        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+          mediaPanel.classList.add('show');
+          mediaVideo.srcObject = stream;
+          state.cam02Played = true;
+        });
+      }
+
       state.voyeur += dt;
       scoreEl.textContent = Math.floor(state.voyeur);
+
     } else {
       state.current = null;
       state.fixation = 0;
@@ -155,9 +188,11 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(loop);
   }
 
-  /* ===== START ===== */
-  btnStart.onclick = () => {
-    btnStart.disabled = true;
+  /* ================= START ================= */
+
+  btnStart.addEventListener('click', () => {
+    sceneStart.classList.remove('active');
+    sceneWall.classList.add('active');
 
     webgazer.setGazeListener(data => {
       if (!data) return;
@@ -168,6 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
     state.running = true;
     last = performance.now();
     requestAnimationFrame(loop);
-  };
+  });
 
 });
