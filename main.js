@@ -1,156 +1,127 @@
-console.log('MAIN JS START');
-
-document.addEventListener('DOMContentLoaded', () => {
-
-  console.log('DOM READY');
-
-  const wall = document.getElementById('wall-grid');
-  const labelViewer = document.getElementById('label-viewer');
-  const scoreEl = document.getElementById('score-voyeur');
-  const gazeDot = document.getElementById('gaze-dot');
-  const mainVideo = document.getElementById('main-video');
-
-  if (!wall) {
-    console.error('wall-grid NOT FOUND');
-    return;
-  }
-
-  /* ===============================
-     CAMERA DEFINITIONS
-  =============================== */
-  const CAMS = [
-    { id: 'CAM_01', name: 'PRIVATE_SUITE' },
-    { id: 'CAM_02', name: 'SERVICE_CORRIDOR' },
-    { id: 'CAM_03', name: 'STAIRWELL_C2' },
-    { id: 'CAM_04', name: 'REAR_ENTRANCE' },
-    { id: 'CAM_05', name: 'PARKING_LOT_A' },
-    { id: 'CAM_06', name: 'OFFICE_DESK_03' }
-  ];
-
-  /* ===============================
-     BUILD WALL (关键部分)
-  =============================== */
-  wall.innerHTML = ''; // 防止残留
-
-  CAMS.forEach(cam => {
-    const el = document.createElement('div');
-    el.className = 'cam';
-    el.dataset.cam = cam.id;
-    el.innerHTML = `
-      <div class="cam-label">
-        ${cam.name} / ${cam.id}
-      </div>
-    `;
-    wall.appendChild(el);
-  });
-
-  console.log('CAM WALL BUILT:', wall.children.length);
-
-  /* ===============================
-     STATE
-  =============================== */
-  const state = {
-    gaze: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
-    smooth: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
-    fixation: 0,
-    current: null,
-    voyeur: 0,
-    cam01Played: false,
-    cam02Played: false
+(() => {
+  const scenes = {
+    loading: document.getElementById('scene-loading'),
+    wall: document.getElementById('scene-wall'),
+    logs: document.getElementById('scene-logs'),
+    report: document.getElementById('scene-report'),
+    camViewer: document.getElementById('scene-cam-viewer'),
   };
 
-  /* ===============================
-     WEBGAZER
-  =============================== */
-  webgazer.setGazeListener(data => {
-    if (!data) return;
-    state.gaze.x = data.x;
-    state.gaze.y = data.y;
-  }).begin();
+  const wallGrid = document.getElementById('wall-grid');
+  const labelViewer = document.getElementById('label-viewer');
+  const scoreVoyeur = document.getElementById('score-voyeur');
+  const fixProgress = document.getElementById('fix-progress');
 
-  function smoothGaze() {
-    state.smooth.x += (state.gaze.x - state.smooth.x) * 0.15;
-    state.smooth.y += (state.gaze.y - state.smooth.y) * 0.15;
+  const camVideo = document.getElementById('cam-video');
+  const btnCloseCam = document.getElementById('btn-close-cam');
+
+  const CFG = {
+    ghostTime: 2.2,
+    turnTime: 3.0
+  };
+
+  const state = {
+    wallWindows: [],
+    currentTarget: null,
+    fixationS: 0,
+    voyeurScore: 0,
+    ghostTriggered: false
+  };
+
+  function switchScene(name) {
+    Object.values(scenes).forEach(s => s.classList.remove('active'));
+    scenes[name].classList.add('active');
   }
 
-  function hitTest() {
-    return [...document.querySelectorAll('.cam')].find(cam => {
-      const r = cam.getBoundingClientRect();
-      return (
-        state.smooth.x >= r.left &&
-        state.smooth.x <= r.right &&
-        state.smooth.y >= r.top &&
-        state.smooth.y <= r.bottom
-      );
+  /* =========================
+     WALL SETUP
+  ========================= */
+  function createWall() {
+    const cams = [
+      { id: 'CAM_01', type: 'PRIVATE_SUITE' },
+      { id: 'CAM_02', type: 'SERVICE_CORRIDOR' },
+      { id: 'CAM_03', type: 'STAIRWELL_C2' },
+      { id: 'CAM_04', type: 'REAR_ENTRANCE' },
+      { id: 'CAM_05', type: 'PARKING_LOT_A' },
+      { id: 'CAM_06', type: 'OFFICE_DESK_03' },
+    ];
+
+    wallGrid.innerHTML = '';
+    state.wallWindows = [];
+
+    cams.forEach(cam => {
+      const el = document.createElement('div');
+      el.className = 'cam-window';
+      el.innerHTML = `
+        <div class="cam-window-inner"></div>
+        <div class="cam-label">${cam.type} / ${cam.id}</div>
+        <div class="cam-rec">REC</div>
+      `;
+
+      el.addEventListener('click', () => openCamViewer(cam.id));
+
+      wallGrid.appendChild(el);
+      state.wallWindows.push({ el, id: cam.id, type: cam.type });
     });
   }
 
-  /* ===============================
-     MAIN LOOP
-  =============================== */
-  let last = performance.now();
+  /* =========================
+     CAM VIEWER
+  ========================= */
+  async function openCamViewer(camId) {
+    switchScene('camViewer');
 
-  function loop(t) {
-    const dt = (t - last) / 1000;
-    last = t;
-
-    smoothGaze();
-
-    gazeDot.style.left = state.smooth.x + 'px';
-    gazeDot.style.top = state.smooth.y + 'px';
-
-    document.querySelectorAll('.cam').forEach(c => {
-      c.className = 'cam';
-    });
-
-    const hit = hitTest();
-
-    if (hit) {
-      hit.classList.add('gaze-enter');
-
-      if (state.current !== hit) {
-        state.current = hit;
-        state.fixation = 0;
-        state.cam01Played = false;
-        state.cam02Played = false;
-      } else {
-        state.fixation += dt;
-      }
-
-      const camId = hit.dataset.cam;
-      labelViewer.textContent = `${camId} – ${state.fixation.toFixed(1)}s`;
-
-      if (state.fixation > 0.4) hit.classList.add('level-1');
-      if (state.fixation > 0.9) hit.classList.add('level-2');
-      if (state.fixation > 1.4) hit.classList.add('level-3');
-      if (state.fixation > 2.2) hit.classList.add('ghost');
-
-      /* VIDEO TRIGGERS */
-      if (camId === 'CAM_01' && state.fixation >= 2 && !state.cam01Played) {
-        mainVideo.srcObject = null;
-        mainVideo.src = 'suit.mov';
-        mainVideo.play();
-        state.cam01Played = true;
-      }
-
-      if (camId === 'CAM_02' && state.fixation >= 2 && !state.cam02Played) {
-        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-          mainVideo.srcObject = stream;
-          state.cam02Played = true;
-        });
-      }
-
-      state.voyeur += dt;
-      scoreEl.textContent = Math.floor(state.voyeur);
-
-    } else {
-      state.current = null;
-      state.fixation = 0;
-      labelViewer.textContent = 'None';
+    if (camId === 'CAM_01') {
+      camVideo.src = 'suit.mov';   // ✅ GitHub 中的视频
+      camVideo.play();
     }
 
-    requestAnimationFrame(loop);
+    if (camId === 'CAM_02') {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      camVideo.srcObject = stream;
+      camVideo.play();
+    }
   }
 
-  requestAnimationFrame(loop);
-});
+  btnCloseCam.onclick = () => {
+    camVideo.pause();
+    camVideo.src = '';
+    camVideo.srcObject = null;
+    switchScene('wall');
+  };
+
+  /* =========================
+     REACTION LOGIC (简化演示)
+  ========================= */
+  function simulateFixation(dt) {
+    state.fixationS += dt;
+    labelViewer.textContent = `Fixation: ${state.fixationS.toFixed(2)}s`;
+
+    const pct = Math.min(state.fixationS / CFG.ghostTime, 1);
+    fixProgress.style.width = (pct * 100) + '%';
+
+    state.voyeurScore += dt * 10;
+    scoreVoyeur.textContent = Math.floor(state.voyeurScore);
+
+    if (state.fixationS >= CFG.ghostTime && !state.ghostTriggered) {
+      state.ghostTriggered = true;
+      document.body.classList.add('system-heartbeat');
+      setTimeout(() => {
+        document.body.classList.remove('system-heartbeat');
+      }, 350);
+    }
+  }
+
+  /* =========================
+     INIT
+  ========================= */
+  function init() {
+    switchScene('wall');
+    createWall();
+
+    // demo loop（你真实项目中这里接 gaze）
+    setInterval(() => simulateFixation(0.05), 50);
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
