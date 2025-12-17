@@ -3,69 +3,380 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WINDOW</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>WINDOW // Monitor System (Step 1)</title>
+  <style>
+    /* =========================
+       STEP 1: Minimal Skeleton
+       One file only. No external CSS/JS.
+       ========================= */
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at top, #161824 0%, #05060a 65%);
+      color: #e6e9ff;
+      overflow: hidden;
+    }
+
+    /* Scenes */
+    .scene { display: none; height: 100vh; }
+    .scene.active { display: flex; }
+
+    /* Loading Scene */
+    #scene-loading {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .loading-card {
+      width: min(560px, 92vw);
+      padding: 26px 22px 22px;
+      border: 1px solid rgba(120, 130, 255, 0.22);
+      border-radius: 14px;
+      background: linear-gradient(145deg, rgba(16,18,30,0.78), rgba(5,6,10,0.86));
+      box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+    }
+    .title {
+      font-size: 14px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #cbd1ff;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(230,233,255,0.68);
+      line-height: 1.8;
+      margin-bottom: 18px;
+      white-space: pre-line;
+    }
+    .btn {
+      border: 0;
+      cursor: pointer;
+      padding: 11px 22px;
+      border-radius: 999px;
+      background: #ff5353;
+      color: #fff;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      box-shadow: 0 0 16px rgba(255,83,83,0.55);
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+    .btn:hover { transform: translateY(-1px); background: #ff6b6b; box-shadow: 0 0 22px rgba(255,83,83,0.75); }
+
+    /* Wall Scene */
+    #scene-wall {
+      flex-direction: column;
+    }
+    .topbar {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid rgba(120, 130, 255, 0.18);
+      background: linear-gradient(to right, rgba(5,6,10,1), rgba(16,18,30,0.9) 60%, rgba(5,6,10,1));
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-size: 11px;
+      color: rgba(230,233,255,0.85);
+    }
+    .topbar .left { display: flex; gap: 12px; align-items: center; }
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(120, 130, 255, 0.22);
+      background: rgba(8,10,18,0.55);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: none;
+      color: rgba(200,210,255,0.9);
+    }
+
+    .layout {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    /* 6-camera grid */
+    #wall-grid {
+      flex: 3;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 10px;
+      padding: 14px;
+      min-height: 0;
+      border-right: 1px solid rgba(120, 130, 255, 0.12);
+      background: radial-gradient(circle at top, rgba(21,24,36,1) 0%, rgba(5,6,10,1) 65%);
+    }
+
+    .cam {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(170, 180, 255, 0.18);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.2)),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, rgba(0,0,0,0) 5px, rgba(0,0,0,0) 9px);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease, filter .12s ease;
+      filter: grayscale(0.5) contrast(1.05) brightness(0.95);
+    }
+    .cam::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.12), transparent 55%);
+      pointer-events: none;
+      opacity: 0.9;
+    }
+    .cam .label {
+      position: absolute;
+      left: 10px;
+      bottom: 8px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(210,218,255,0.9);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.65);
+    }
+    .cam .rec {
+      position: absolute;
+      right: 10px;
+      top: 8px;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #ff5353;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    }
+    .cam.focused {
+      border-color: rgba(255,83,83,0.9);
+      box-shadow: 0 0 26px rgba(255,83,83,0.25), inset 0 0 0 1px rgba(255,83,83,0.25);
+      transform: translateY(-1px);
+      filter: grayscale(0.1) contrast(1.08) brightness(1.05);
+    }
+
+    /* Side panel */
+    .panel {
+      flex: 1.2;
+      min-width: 260px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: radial-gradient(circle at top right, rgba(23,26,41,1), rgba(5,6,10,1) 70%);
+    }
+    .block {
+      border-radius: 12px;
+      border: 1px solid rgba(120, 130, 255, 0.18);
+      background: linear-gradient(145deg, rgba(16,18,30,0.75), rgba(6,7,13,0.9));
+      padding: 12px;
+    }
+    .block h3 {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(210,218,255,0.9);
+      margin-bottom: 6px;
+    }
+    .value {
+      font-size: 13px;
+      color: rgba(230,233,255,0.82);
+      letter-spacing: 0.04em;
+    }
+    .big {
+      font-size: 34px;
+      color: #ff5353;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+    .muted {
+      color: rgba(230,233,255,0.55);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* Gaze dot (mouse simulator) */
+    #gaze-dot {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      margin-left: -5px;
+      margin-top: -5px;
+      border-radius: 50%;
+      background: #ff4444;
+      box-shadow: 0 0 14px rgba(255,70,70,0.85);
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+    }
+
+    /* Small screens */
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; }
+      #wall-grid { border-right: none; border-bottom: 1px solid rgba(120,130,255,0.12); }
+      .panel { min-width: auto; }
+    }
+  </style>
 </head>
-
 <body>
-  <!-- Scene: Start -->
-  <section id="scene-start" class="scene active">
-    <div class="center">
+
+  <!-- Scene 1 -->
+  <div id="scene-loading" class="scene active">
+    <div class="loading-card">
       <div class="title">WINDOW // MONITOR SYSTEM</div>
-      <div class="subtitle">Anti-surveillance interface prototype</div>
-      <button id="btn-start" class="btn primary">Enter CCTV Wall</button>
-      <div class="hint">If the button works, we are ready for the next step.</div>
-    </div>
-  </section>
-
-  <!-- Scene: Wall -->
-  <section id="scene-wall" class="scene">
-    <header class="topbar">
-      <div class="brand">WINDOW / CCTV GRID</div>
-      <div class="status">
-        <span id="status-eye">EYE: OFF</span>
-        <span id="status-mode">MODE: MANUAL</span>
+      <div class="subtitle" id="loading-text">INITIALIZING...\nCONNECTING TO CCTV GRID...\nPREPARING INTERFACE...</div>
+      <button id="btn-enter" class="btn">Enter CCTV Wall</button>
+      <div class="muted" style="margin-top:12px;">
+        Step 1 = layout + scene switching + 6-grid generation (mouse sim).
       </div>
-    </header>
+    </div>
+  </div>
 
-    <main class="layout">
-      <section id="wall-grid" class="grid"></section>
+  <!-- Scene 2 -->
+  <div id="scene-wall" class="scene">
+    <div class="topbar">
+      <div class="left">
+        <div>WINDOW / CCTV GRID</div>
+        <div class="pill" id="status-eye">EYE: OFF</div>
+        <div class="pill" id="status-mode">MODE: MANUAL</div>
+      </div>
+      <div class="pill" id="status-debug">READY</div>
+    </div>
+
+    <div class="layout">
+      <section id="wall-grid" aria-label="CCTV Wall Grid"></section>
 
       <aside class="panel">
-        <div class="card">
-          <div class="card-title">Current Window</div>
-          <div id="label" class="card-value">None</div>
+        <div class="block">
+          <h3>Current Window</h3>
+          <div class="value" id="current-window">None</div>
         </div>
-
-        <div class="card">
-          <div class="card-title">Voyeur Score</div>
-          <div id="score" class="score">0</div>
+        <div class="block">
+          <h3>Voyeur Score</h3>
+          <div class="big" id="voyeur-score">0</div>
         </div>
-
-        <div class="card">
-          <button id="btn-logs" class="btn">Open Logs</button>
+        <div class="block">
+          <h3>Debug</h3>
+          <div class="muted" id="debug-text">Move mouse to simulate gaze dot. Hover a tile to focus.</div>
+        </div>
+        <div class="block" style="margin-top:auto;">
+          <button class="btn" id="btn-back" style="width:100%; background: transparent; border:1px solid rgba(120,130,255,0.22); box-shadow:none;">
+            Back to Start
+          </button>
         </div>
       </aside>
-    </main>
+    </div>
 
-    <div id="gaze-dot" aria-hidden="true"></div>
-  </section>
+    <div id="gaze-dot"></div>
+  </div>
 
-  <!-- Scene: Logs -->
-  <section id="scene-logs" class="scene">
-    <header class="topbar">
-      <div class="brand">WINDOW / LOG CONSOLE</div>
-      <div class="status">
-        <span id="status-log">STATUS: READY</span>
-        <button id="btn-back" class="btn">Back</button>
-      </div>
-    </header>
+  <script>
+    // =========================
+    // STEP 1 JS: minimal + stable
+    // =========================
+    const scenes = {
+      loading: document.getElementById('scene-loading'),
+      wall: document.getElementById('scene-wall'),
+    };
 
-    <main class="logs">
-      <div id="logbox" class="logbox"></div>
-    </main>
-  </section>
+    const btnEnter = document.getElementById('btn-enter');
+    const btnBack = document.getElementById('btn-back');
+    const wallGrid = document.getElementById('wall-grid');
 
-  <script src="main.js"></script>
+    const currentWindowEl = document.getElementById('current-window');
+    const scoreEl = document.getElementById('voyeur-score');
+    const gazeDot = document.getElementById('gaze-dot');
+
+    const CAMS = [
+      "BEDROOM // CAM_01",
+      "KITCHEN // CAM_02",
+      "STAIRCASE // CAM_03",
+      "GARAGE // CAM_04",
+      "HALLWAY // CAM_05",
+      "STORAGE // CAM_06",
+    ];
+
+    let score = 0;
+    let lastFocusedIndex = -1;
+
+    function showScene(name) {
+      Object.values(scenes).forEach(s => s.classList.remove('active'));
+      scenes[name].classList.add('active');
+      console.log('[UI] scene ->', name);
+    }
+
+    function buildGrid() {
+      wallGrid.innerHTML = '';
+      CAMS.forEach((label, i) => {
+        const tile = document.createElement('div');
+        tile.className = 'cam';
+        tile.dataset.index = String(i);
+
+        const rec = document.createElement('div');
+        rec.className = 'rec';
+        rec.textContent = 'REC';
+
+        const txt = document.createElement('div');
+        txt.className = 'label';
+        txt.textContent = label;
+
+        tile.appendChild(rec);
+        tile.appendChild(txt);
+
+        tile.addEventListener('mouseenter', () => focusCam(i));
+        tile.addEventListener('click', () => focusCam(i));
+
+        wallGrid.appendChild(tile);
+      });
+
+      console.log('[GRID] built cams:', wallGrid.children.length);
+    }
+
+    function focusCam(i) {
+      const tiles = wallGrid.querySelectorAll('.cam');
+      tiles.forEach(t => t.classList.remove('focused'));
+      const target = tiles[i];
+      if (!target) return;
+
+      target.classList.add('focused');
+      currentWindowEl.textContent = CAMS[i].split('//')[0].trim();
+
+      if (i !== lastFocusedIndex) {
+        score++;
+        scoreEl.textContent = String(score);
+        lastFocusedIndex = i;
+      }
+
+      console.log('[FOCUS]', CAMS[i]);
+    }
+
+    // Mouse gaze dot simulator
+    window.addEventListener('mousemove', (e) => {
+      gazeDot.style.display = 'block';
+      gazeDot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    });
+
+    btnEnter.addEventListener('click', () => {
+      buildGrid();
+      showScene('wall');
+    });
+
+    btnBack.addEventListener('click', () => {
+      showScene('loading');
+    });
+
+    // Boot
+    console.log('[WINDOW] Step 1 boot');
+  </script>
 </body>
 </html>
