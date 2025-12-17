@@ -85,31 +85,66 @@
   /* =========================
      CCTV WALL CREATION
   ========================= */
-  function createWall() {
-    wallGrid.innerHTML = '';
-    state.wallWindows = [];
+function createWall() {
+  wallGrid.innerHTML = '';
+  state.wallWindows = [];
 
-    for (let i = 0; i < 6; i++) {
-      const type = WINDOW_TYPES[i];
-      const el = document.createElement('div');
-      el.className = 'cam-window';
+  const CAMS = [
+    {
+      id: 'CAM_01',
+      type: 'PRIVATE_SUITE',
+      label: 'PRIVATE_SUITE / CAM_01',
+    },
+    {
+      id: 'CAM_02',
+      type: 'SERVICE_CORRIDOR',
+      label: 'SERVICE_CORRIDOR / CAM_02',
+    },
+    {
+      id: 'CAM_03',
+      type: 'STAIRWELL_C2',
+      label: 'STAIRWELL_C2 / CAM_03',
+    },
+    {
+      id: 'CAM_04',
+      type: 'REAR_ENTRANCE',
+      label: 'REAR_ENTRANCE / CAM_04',
+    },
+    {
+      id: 'CAM_05',
+      type: 'PARKING_LOT_A',
+      label: 'PARKING_LOT_A / CAM_05',
+    },
+    {
+      id: 'CAM_06',
+      type: 'OFFICE_DESK_03',
+      label: 'OFFICE_DESK_03 / CAM_06',
+    },
+  ];
 
-      el.innerHTML = `
-        <div class="cam-window-inner"></div>
-        <div class="cam-label">${type}</div>
-        <div class="cam-rec">REC</div>
-      `;
+  CAMS.forEach((cam) => {
+    const el = document.createElement('div');
+    el.className = 'cam-window';
+    el.dataset.cam = cam.id;
+    el.dataset.type = cam.type;
 
-      wallGrid.appendChild(el);
+    el.innerHTML = `
+      <div class="cam-window-inner"></div>
+      <div class="cam-label">${cam.label}</div>
+      <div class="cam-rec">REC</div>
+      <div class="cam-overlay"></div>
+    `;
 
-      state.wallWindows.push({
-        el,
-        type,
-        fixationAccumulated: 0,
-        hasTriggered: false,
-      });
-    }
-  }
+    wallGrid.appendChild(el);
+
+    state.wallWindows.push({
+      el,
+      camId: cam.id,
+      type: cam.type,
+      triggeredLevel: 0,
+    });
+  });
+}
 
   /* =========================
      VOYEUR SCORE UPDATE
